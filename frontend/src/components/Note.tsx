@@ -1,3 +1,5 @@
+// src/components/Note.tsx
+
 export interface NoteProps {
   created_at: string;
   title: string;

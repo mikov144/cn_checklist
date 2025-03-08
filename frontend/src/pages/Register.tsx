@@ -1,3 +1,5 @@
+// src/pages/Register.tsx
+
 import Form from "../components/Form"
 
 function Register() {
