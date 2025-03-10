@@ -42,11 +42,11 @@ function Form() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-6 text-center">{name}</h1>
+    <div className="flex items-center justify-center min-h-screen bg-synth-background">
+      <form onSubmit={handleSubmit} className="bg-synth-background p-8 rounded-lg neon-border max-w-md w-full">
+        <h1 className="text-3xl font-retro neon-text text-synth-primary mb-6 text-center">{name}</h1>
         <input
-          className="block w-full p-3 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="block w-full p-3 border border-synth-primary rounded mb-4 bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary"
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -54,7 +54,7 @@ function Form() {
           required
         />
         <input
-          className="block w-full p-3 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="block w-full p-3 border border-synth-primary rounded mb-4 bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -63,15 +63,15 @@ function Form() {
         />
         {loading && <LoadingIndicator />}
         <button
-          className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="button-retro w-full py-3 rounded"
           type="submit"
         >
           {name}
         </button>
-        <p className="text-center mt-4">
+        <p className="text-center mt-4 text-synth-secondary neon-text">
           {method === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
           <span
-            className="text-blue-500 cursor-pointer hover:underline"
+            className="text-synth-primary cursor-pointer hover:underline"
             onClick={toggleMethod}
           >
             {method === "login" ? "Register here" : "Login here"}

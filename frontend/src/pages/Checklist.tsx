@@ -49,18 +49,24 @@ function Checklist() {
   };
 
   return (
-    <div className="font-sans min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-synth-background">
       <Header />
       <div className="p-6">
         <div className="notes-section mb-8">
-          <h2 className="text-gray-800 text-2xl">Notes</h2>
+          <h2 className="text-3xl font-retro neon-text text-synth-primary mb-6">
+            Notes
+          </h2>
           {notes.map((note) => (
             <Note note={note} onDelete={deleteNote} key={note.id} />
           ))}
         </div>
-        <h2 className="text-gray-800 text-2xl mb-5">Create a Note</h2>
-        <form onSubmit={createNote} className="bg-white p-5 rounded-lg shadow max-w-md mx-auto">
-          <label htmlFor="title" className="font-bold mt-2">Title:</label>
+        <h2 className="text-3xl font-retro neon-text text-synth-primary mb-6">
+          Create a Note
+        </h2>
+        <form onSubmit={createNote} className="bg-synth-background p-6 rounded-lg neon-border max-w-md mx-auto">
+          <label htmlFor="title" className="font-bold mt-2 text-synth-secondary neon-text">
+            Title:
+          </label>
           <br />
           <input
             type="text"
@@ -69,9 +75,11 @@ function Checklist() {
             required
             onChange={(e) => setTitle(e.target.value)}
             value={title}
-            className="w-full p-2 my-2 border border-gray-300 rounded"
+            className="w-full p-2 my-2 border border-synth-primary rounded bg-synth-background text-synth-text neon-text"
           />
-          <label htmlFor="content" className="font-bold mt-2">Content:</label>
+          <label htmlFor="content" className="font-bold mt-2 text-synth-secondary neon-text">
+            Content:
+          </label>
           <br />
           <textarea
             id="content"
@@ -79,10 +87,14 @@ function Checklist() {
             required
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full p-2 my-2 border border-gray-300 rounded"
+            className="w-full p-2 my-2 border border-synth-primary rounded bg-synth-background text-synth-text neon-text"
           ></textarea>
           <br />
-          <input type="submit" value="Submit" className="bg-blue-500 text-white p-2 rounded cursor-pointer hover:bg-blue-700" />
+          <input
+            type="submit"
+            value="Submit"
+            className="button-retro w-full py-2 px-4 rounded cursor-pointer"
+          />
         </form>
       </div>
     </div>

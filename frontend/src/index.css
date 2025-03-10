@@ -1,3 +1,32 @@
 /* index.css */
 
 @import "tailwindcss";
+
+body {
+  background-color: #1A1A2E;
+  color: #FFFFFF;
+  font-family: 'Teko', sans-serif;
+}
+
+/* Neon glow effect */
+.neon-text {
+  text-shadow: 0 0 5px #FF00FF, 0 0 10px #FF00FF, 0 0 20px #FF00FF;
+}
+
+.neon-border {
+  border: 2px solid #FF007F;
+  box-shadow: 0 0 5px #FF007F, 0 0 10px #FF007F, 0 0 20px #FF007F;
+}
+
+/* Retro button styles */
+.button-retro {
+  background: #FF007F;
+  color: #FFFFFF;
+  border: 2px solid #00FFFF;
+  box-shadow: 0 0 5px #00FFFF, 0 0 10px #00FFFF;
+  transition: all 0.3s ease;
+}
+
+.button-retro:hover {
+  box-shadow: 0 0 10px #FF007F, 0 0 20px #FF007F;
+}
