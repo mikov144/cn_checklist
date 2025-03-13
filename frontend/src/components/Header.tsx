@@ -11,18 +11,30 @@ function Header() {
   };
 
   return (
-    <header className="bg-synth-background p-4 flex items-center justify-between neon-border">
-      {/* Title on the left */}
-      <div className="text-2xl font-retro neon-text text-synth-primary">
-        SynthWave App
+    <header className="bg-synth-background p-4 flex items-center justify-between neon-border bg-gray-900/80">
+      {/* Logo on the left */}
+      <div className="text-2xl font-retro">
+        <Link to="/">
+          <img 
+            src="/images/_milkspace-logo.png" 
+            alt="Milkspace Logo" 
+            className="h-8"  // Adjust height as needed
+          />
+        </Link>
       </div>
 
       {/* Navigation panel in the middle */}
       <nav className="flex space-x-6">
-        <Link to="/" className="text-synth-secondary hover:text-synth-primary neon-text">
+        <Link 
+          to="/" 
+          className="text-synth-secondary hover:text-synth-primary hover:scale-110 active:scale-95 transition-all duration-200 neon-text text-2xl"
+        >
           Home
         </Link>
-        <Link to="/checklist" className="text-synth-secondary hover:text-synth-primary neon-text">
+        <Link 
+          to="/checklist" 
+          className="text-synth-secondary hover:text-synth-primary hover:scale-110 active:scale-95 transition-all duration-200 neon-text text-2xl"
+        >
           Checklist
         </Link>
       </nav>

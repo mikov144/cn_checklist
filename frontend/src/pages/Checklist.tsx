@@ -41,15 +41,20 @@ function Checklist() {
     api
       .post("/api/notes/", { content, title })
       .then((res) => {
-        if (res.status === 201) console.log("Note created!");
-        else alert("Failed to make note.");
+        if (res.status === 201) {
+          console.log("Note created!");
+          setTitle("");
+          setContent("");
+        } else {
+          alert("Failed to make note.");
+        }
         getNotes();
       })
       .catch((err) => alert(err));
   };
 
   return (
-    <div className="min-h-screen bg-synth-background">
+    <div className="min-h-screen bg-synth-background pl-6 pr-6 pt-6 bg-cover bg-center" style={{ backgroundImage: "url('/images/_main-background.webp')" }}>
       <Header />
       <div className="p-6">
         <div className="notes-section mb-8">
@@ -63,7 +68,7 @@ function Checklist() {
         <h2 className="text-3xl font-retro neon-text text-synth-primary mb-6">
           Create a Note
         </h2>
-        <form onSubmit={createNote} className="bg-synth-background p-6 rounded-lg neon-border max-w-md mx-auto">
+        <form onSubmit={createNote} className="bg-synth-background p-6 rounded-lg neon-border max-w-md mx-auto bg-gray-900/90">
           <label htmlFor="title" className="font-bold mt-2 text-synth-secondary neon-text">
             Title:
           </label>

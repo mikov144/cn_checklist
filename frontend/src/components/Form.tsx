@@ -42,8 +42,8 @@ function Form() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-synth-background">
-      <form onSubmit={handleSubmit} className="bg-synth-background p-8 rounded-lg neon-border max-w-md w-full">
+    <div className="flex items-center justify-center min-h-screen bg-synth-background bg-cover bg-center" style={{ backgroundImage: "url('/images/_main-background.webp')" }}>
+      <form onSubmit={handleSubmit} className="bg-synth-background p-8 rounded-lg neon-border max-w-md w-full bg-gray-900/90">
         <h1 className="text-3xl font-retro neon-text text-synth-primary mb-6 text-center">{name}</h1>
         <input
           className="block w-full p-3 border border-synth-primary rounded mb-4 bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary"
@@ -71,7 +71,7 @@ function Form() {
         <p className="text-center mt-4 text-synth-secondary neon-text">
           {method === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
           <span
-            className="text-synth-primary cursor-pointer hover:underline"
+            className="text-synth-primary link-hover inline-block cursor-pointer"
             onClick={toggleMethod}
           >
             {method === "login" ? "Register here" : "Login here"}

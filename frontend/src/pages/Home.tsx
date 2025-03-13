@@ -4,15 +4,54 @@ import Header from "../components/Header";
 
 function Home() {
   return (
-    <div className="min-h-screen bg-synth-background">
+    <div className="min-h-screen bg-synth-background pl-6 pr-6 pt-6 bg-cover bg-center" style={{ backgroundImage: "url('/images/_main-background.webp')" }}>
       <Header />
-      <div className="flex flex-col items-center min-h-screen p-6">
-        <h2 className="text-4xl font-retro neon-text text-synth-primary mb-6">
-          Welcome to SynthWave
-        </h2>
-        <p className="text-synth-secondary neon-text">
-          Dive into the retro-futuristic vibes of the 80s!
-        </p>
+      <div className="flex flex-col items-center p-6 min-h-[calc(100vh-110px)]">
+        <section className="max-w-4xl w-full bg-gray-900/90 rounded-lg p-8 backdrop-blur-sm shadow-lg border border-gray-800">
+          <div className="flex flex-col items-center mb-8">
+            <img src="/images/_about-boop.gif" alt="milk boops" className="w-auto h-37 mb-4" />
+            <h1 className="text-5xl font-retro neon-text text-synth-primary mb-6 text-center">
+              Welcome to the milk's corner! My name is milk!
+            </h1>
+            <img src="/images/_about-milkstand.png" alt="milk stands" className="w-auto h-37 mb-4" />
+          </div>
+
+          <div className="space-y-4 text-synth-secondary neon-text text-xl">
+            <p>
+              I like anime and videogames and my favorite band is Nickelback
+            </p>
+            <p>
+              You can find my YouTube channel here:{' '}
+              <a 
+                href="https://www.youtube.com/channel/UCY2uiqwdT4ET_6hCgg_VgQw" 
+                className="text-synth-primary link-hover inline-block"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                link to my channel
+              </a>
+            </p>
+
+            <h2 className="text-3xl font-retro text-synth-primary mt-8 mb-4">
+              Contact me:
+            </h2>
+
+            <div className="space-y-3">
+              <p>
+                XMPP:{' '}
+                <span className="text-synth-primary">milk@macaw.me</span>
+              </p>
+              <p>
+                Telegram:{' '}
+                <span className="text-synth-primary">@mikov144</span>
+              </p>
+              <p>
+                Discord:{' '}
+                <span className="text-synth-primary">mikov144</span>
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
