@@ -1,12 +1,51 @@
 // src/components/Header.tsx
 
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import api from "../api";
+import { ACCESS_TOKEN } from "../constants";
+
+interface UserProfile {
+  id: number;
+  username: string;
+  profile: {
+    profile_picture: string | null;
+  };
+}
 
 function Header() {
   const navigate = useNavigate();
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem(ACCESS_TOKEN);
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+
+        const response = await api.get('/api/user/');
+        setUser(response.data);
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear();
+    setUser(null);
+    navigate("/login");
+  };
+
+  const handleLogin = () => {
     navigate("/login");
   };
 
@@ -18,7 +57,7 @@ function Header() {
           <img 
             src="/images/_milkspace-logo.png" 
             alt="Milkspace Logo" 
-            className="h-8"  // Adjust height as needed
+            className="h-8"
           />
         </Link>
       </div>
@@ -39,15 +78,36 @@ function Header() {
         </Link>
       </nav>
 
-      {/* User name and logout button on the right */}
+      {/* User profile and auth button on the right */}
       <div className="flex items-center space-x-4">
-        <span className="text-synth-secondary neon-text">Username</span>
-        <button
-          onClick={handleLogout}
-          className="button-retro py-2 px-4 rounded"
-        >
-          Logout
-        </button>
+        {!loading && (
+          <>
+            {user ? (
+              <>
+                <div className="flex items-center space-x-3">
+                  <img 
+                    src={user.profile.profile_picture || "/images/_default_pfp.jpg"}
+                    alt={`${user.username}'s profile`}
+                    className="w-10 h-10 rounded-full border-2 border-synth-primary shadow-lg hover:border-synth-secondary transition-colors duration-200"
+                  />
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="button-retro py-2 px-4 rounded"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleLogin}
+                className="button-retro py-2 px-4 rounded"
+              >
+                Login
+              </button>
+            )}
+          </>
+        )}
       </div>
     </header>
   );
