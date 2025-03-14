@@ -7,17 +7,22 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['profile_picture']
+        extra_kwargs = {
+            'profile_picture': {'required': False}
+        }
 
 class UserSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer()
+    profile = ProfileSerializer(required=False)
 
     class Meta:
         model = User
         fields = ["id", "username", "password", "profile"]
-        extra_kwargs = {"password": {"write_only": True}}
+        extra_kwargs = {
+            "password": {"write_only": True}
+        }
 
     def create(self, validated_data):
-        profile_data = validated_data.pop('profile')
+        profile_data = validated_data.pop('profile', {})
         password = validated_data.pop('password')
         user = User(**validated_data)
         user.set_password(password)
@@ -26,7 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        profile_data = validated_data.pop('profile')
+        profile_data = validated_data.pop('profile', {})
         profile = instance.profile
 
         instance.username = validated_data.get('username', instance.username)
