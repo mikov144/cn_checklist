@@ -105,7 +105,7 @@ function Header() {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="button-retro py-2 px-4 rounded"
+                  className="button-retro py-2 px-4 rounded text-lg"
                 >
                   Logout
                 </button>

@@ -102,33 +102,33 @@ function Profile() {
               alt="Profile"
               className="w-32 h-32 rounded-full border-4 border-synth-primary shadow-lg mb-4"
             />
-            <h2 className="text-2xl font-retro text-synth-primary neon-text">{user?.username}</h2>
+            <h2 className="text-3xl font-retro text-synth-primary neon-text">{user?.username}</h2>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-synth-text mb-2">New username</label>
+              <label className="block text-synth-text mb-2 text-xl">New username</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="block w-full p-3 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary"
+                className="block w-full p-3 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-synth-text mb-2">New password</label>
+              <label className="block text-synth-text mb-2 text-xl">New password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="block w-full p-3 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary"
+                className="block w-full p-3 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
               />
             </div>
 
             <div>
-              <label className="block text-synth-text mb-2">Change profile picture</label>
+              <label className="block text-synth-text mb-2 text-xl">Change profile picture</label>
               <input
                 type="file"
                 accept="image/*"
@@ -162,7 +162,7 @@ function Profile() {
             <button
               type="submit"
               disabled={updating}
-              className="button-retro w-full py-3 rounded disabled:opacity-50"
+              className="button-retro w-full py-3 rounded disabled:opacity-50 text-xl"
             >
               {updating ? "Updating..." : "Update Profile"}
             </button>

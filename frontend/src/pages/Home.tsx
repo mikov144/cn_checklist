@@ -16,7 +16,7 @@ function Home() {
             <img src="/images/_about-milkstand.png" alt="milk stands" className="w-auto h-37 mb-4" />
           </div>
 
-          <div className="space-y-4 text-synth-secondary neon-text text-xl">
+          <div className="space-y-4 text-synth-secondary neon-text text-2xl">
             <p>
               I like anime and videogames and my favorite band is Nickelback
             </p>
