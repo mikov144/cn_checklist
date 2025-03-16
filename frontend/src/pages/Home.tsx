@@ -1,6 +1,7 @@
 // src/pages/Home.tsx
 
 import Header from "../components/Header";
+import { Link } from "react-router-dom";
 
 function Home() {
   return (
@@ -18,36 +19,45 @@ function Home() {
 
           <div className="space-y-4 text-synth-secondary neon-text text-2xl">
             <p>
-              I like anime and videogames and my favorite band is Nickelback
+              I like anime and videogames and my favorite band is Nickelback!
             </p>
             <p>
-              You can find my YouTube channel here:{' '}
-              <a 
-                href="https://www.youtube.com/channel/UCY2uiqwdT4ET_6hCgg_VgQw" 
-                className="text-synth-primary link-hover inline-block"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                link to my channel
-              </a>
+              Be sure to <span className="highlight-text">register</span> or <span className="highlight-text">log in</span> to use all of the website's features! Current avaiable functionality:
             </p>
-
+            <ul>
+              <li>
+                <Link to="/checklist" className="text-synth-primary link-hover inline-block highlight-text cursor-pointer">
+                  Checklist
+                </Link>
+              </li>
+            </ul>
             <h2 className="text-3xl font-retro text-synth-primary mt-8 mb-4">
               Contact me:
             </h2>
 
             <div className="space-y-3">
               <p>
+                You can find my YouTube channel here:{' '}
+                <a 
+                  href="https://www.youtube.com/channel/UCY2uiqwdT4ET_6hCgg_VgQw" 
+                  className="text-synth-primary link-hover inline-block highlight-text"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  link to my channel
+                </a>
+              </p>
+              <p>
                 XMPP:{' '}
-                <span className="text-synth-primary">milk@macaw.me</span>
+                <span className="text-synth-primary highlight-text">milk@macaw.me</span>
               </p>
               <p>
                 Telegram:{' '}
-                <span className="text-synth-primary">@mikov144</span>
+                <span className="text-synth-primary highlight-text">@mikov144</span>
               </p>
               <p>
                 Discord:{' '}
-                <span className="text-synth-primary">mikov144</span>
+                <span className="text-synth-primary highlight-text">mikov144</span>
               </p>
             </div>
           </div>

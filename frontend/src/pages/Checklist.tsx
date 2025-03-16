@@ -5,6 +5,7 @@ import api from "../api";
 import Note, { NoteProps } from "../components/Note";
 import Header from "../components/Header";
 import Modal from "../components/Modal";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 interface FormData {
   title: string;
@@ -87,6 +88,7 @@ const NoteForm = ({
 
 function Checklist() {
   const [notes, setNotes] = useState<NoteProps[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -100,6 +102,7 @@ function Checklist() {
   }, []);
 
   const getNotes = () => {
+    setLoading(true);
     api
       .get("/api/notes/")
       .then((res) => res.data)
@@ -107,7 +110,10 @@ function Checklist() {
         setNotes(data);
         console.log(data);
       })
-      .catch((err) => alert(err));
+      .catch((err) => alert(err))
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const handleDeleteClick = (id: number) => {
@@ -181,6 +187,10 @@ function Checklist() {
     setEditFormData({ title: "", content: "" });
     setNoteToEdit(null);
   };
+
+  if (loading) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <div className="min-h-screen bg-synth-background pl-6 pr-6 pt-6 bg-cover bg-center" style={{ backgroundImage: "url('/images/_main-background.webp')" }}>

@@ -72,3 +72,8 @@ body {
 .link-hover:hover::after {
   width: 100%;
 }
+
+.highlight-text {
+  color: #33f06b;
+  text-shadow: 0 0 10px #33f06b, 0 0 0 #33f06b, 0 0 1px #33f06b;
+}
