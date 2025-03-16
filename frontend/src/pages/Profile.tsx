@@ -5,41 +5,34 @@ import Header from "../components/Header";
 import LoadingIndicator from "../components/LoadingIndicator";
 import { useUser } from "../context/UserContext";
 
-interface UserProfile {
-  id: number;
-  username: string;
-  profile: {
-    profile_picture: string | null;
-  };
-}
-
 function Profile() {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading: userLoading, refreshUserData } = useUser();
   const [updating, setUpdating] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const { refreshUserData } = useUser();
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const initializeUser = async () => {
       try {
-        const response = await api.get('/api/user/');
-        setUser(response.data);
-        setUsername(response.data.username);
+        await refreshUserData();
       } catch (error) {
         console.error('Failed to fetch user data:', error);
         navigate('/login');
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchUserData();
-  }, [navigate]);
+    initializeUser();
+  }, []); // Remove refreshUserData from dependencies to prevent re-runs
+
+  // Update username when user data is loaded
+  useEffect(() => {
+    if (user) {
+      setUsername(user.username);
+    }
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -67,12 +60,7 @@ function Profile() {
       }
 
       // Refresh user data
-      const response = await api.get('/api/user/');
-      setUser(response.data);
-      
-      // Trigger header refresh
-      refreshUserData();
-
+      await refreshUserData();
       alert("Profile updated successfully!");
     } catch (error) {
       alert("Failed to update profile. Please try again.");
@@ -87,7 +75,7 @@ function Profile() {
     }
   };
 
-  if (loading) {
+  if (userLoading && !user) {
     return <LoadingIndicator />;
   }
 

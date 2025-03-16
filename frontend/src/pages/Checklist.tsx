@@ -1,11 +1,12 @@
 // src/pages/Checklist.tsx
 
-import { useState, useEffect } from "react";
-import api from "../api";
+import { useState, useEffect, useCallback } from "react";
 import Note, { NoteProps } from "../components/Note";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import Modal from "../components/Modal";
 import LoadingIndicator from "../components/LoadingIndicator";
+import { useNotes } from "../context/NotesContext";
 
 interface FormData {
   title: string;
@@ -87,8 +88,7 @@ const NoteForm = ({
 );
 
 function Checklist() {
-  const [notes, setNotes] = useState<NoteProps[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { notes, loading, refreshNotes, createNote: createNoteApi, updateNote: updateNoteApi, deleteNote: deleteNoteApi } = useNotes();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -98,104 +98,77 @@ function Checklist() {
   const [editFormData, setEditFormData] = useState<FormData>({ title: "", content: "" });
 
   useEffect(() => {
-    getNotes();
-  }, []);
+    const initializeNotes = async () => {
+      await refreshNotes();
+    };
+    initializeNotes();
+  }, []); // Remove refreshNotes from dependencies to prevent re-runs
 
-  const getNotes = () => {
-    setLoading(true);
-    api
-      .get("/api/notes/")
-      .then((res) => res.data)
-      .then((data) => {
-        setNotes(data);
-        console.log(data);
-      })
-      .catch((err) => alert(err))
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
-  const handleDeleteClick = (id: number) => {
+  const handleDeleteClick = useCallback((id: number) => {
     setNoteToDelete(id);
     setIsDeleteModalOpen(true);
-  };
+  }, []);
 
-  const handleEditClick = (note: NoteProps) => {
+  const handleEditClick = useCallback((note: NoteProps) => {
     setNoteToEdit(note);
     setEditFormData({ title: note.title, content: note.content });
     setIsEditModalOpen(true);
-  };
+  }, []);
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (noteToDelete === null) return;
-
-    api
-      .delete(`/api/notes/delete/${noteToDelete}/`)
-      .then((res) => {
-        if (res.status === 204) console.log("Note deleted!");
-        else alert("Failed to delete note.");
-        getNotes();
-      })
-      .catch((error) => alert(error));
+    try {
+      await deleteNoteApi(noteToDelete);
+      setIsDeleteModalOpen(false);
+      setNoteToDelete(null);
+    } catch (error) {
+      alert("Failed to delete note: " + error);
+    }
   };
 
-  const createNote = (e: React.FormEvent) => {
+  const handleCreateNote = async (e: React.FormEvent) => {
     e.preventDefault();
-    api
-      .post("/api/notes/", createFormData)
-      .then((res) => {
-        if (res.status === 201) {
-          console.log("Note created!");
-          setCreateFormData({ title: "", content: "" });
-          setIsCreateModalOpen(false);
-        } else {
-          alert("Failed to make note.");
-        }
-        getNotes();
-      })
-      .catch((err) => alert(err));
+    try {
+      await createNoteApi(createFormData.title, createFormData.content);
+      setCreateFormData({ title: "", content: "" });
+      setIsCreateModalOpen(false);
+    } catch (error) {
+      alert("Failed to create note: " + error);
+    }
   };
 
-  const updateNote = (e: React.FormEvent) => {
+  const handleUpdateNote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!noteToEdit) return;
-
-    api
-      .put(`/api/notes/update/${noteToEdit.id}/`, editFormData)
-      .then((res) => {
-        if (res.status === 200) {
-          console.log("Note updated!");
-          setEditFormData({ title: "", content: "" });
-          setIsEditModalOpen(false);
-          setNoteToEdit(null);
-        } else {
-          alert("Failed to update note.");
-        }
-        getNotes();
-      })
-      .catch((err) => alert(err));
+    try {
+      await updateNoteApi(noteToEdit.id, editFormData.title, editFormData.content);
+      setEditFormData({ title: "", content: "" });
+      setIsEditModalOpen(false);
+      setNoteToEdit(null);
+    } catch (error) {
+      alert("Failed to update note: " + error);
+    }
   };
 
-  const handleCreateModalClose = () => {
+  const handleCreateModalClose = useCallback(() => {
     setIsCreateModalOpen(false);
     setCreateFormData({ title: "", content: "" });
-  };
+  }, []);
 
-  const handleEditModalClose = () => {
+  const handleEditModalClose = useCallback(() => {
     setIsEditModalOpen(false);
     setEditFormData({ title: "", content: "" });
     setNoteToEdit(null);
-  };
+  }, []);
 
-  if (loading) {
+  if (loading && notes.length === 0) {
     return <LoadingIndicator />;
   }
 
   return (
-    <div className="min-h-screen bg-synth-background pl-6 pr-6 pt-6 bg-cover bg-center" style={{ backgroundImage: "url('/images/_main-background.webp')" }}>
+    <div className="min-h-screen bg-synth-background bg-cover bg-center flex flex-col pl-6 pr-6 pt-6" style={{ backgroundImage: "url('/images/_main-background.webp')"}}>
       <Header />
-      <div className="p-6">
+      <div className="flex-grow p-6">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-4xl font-retro neon-text text-synth-primary">
             Notes
@@ -218,8 +191,9 @@ function Checklist() {
           ))}
         </div>
       </div>
+      <Footer />
 
-      {/* Delete Confirmation Modal */}
+      {/* Modals */}
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
@@ -228,7 +202,6 @@ function Checklist() {
         message="Are you sure you want to delete this note?"
       />
 
-      {/* Create Note Modal */}
       <Modal
         isOpen={isCreateModalOpen}
         onClose={handleCreateModalClose}
@@ -236,7 +209,7 @@ function Checklist() {
         showActions={false}
       >
         <NoteForm 
-          onSubmit={createNote} 
+          onSubmit={handleCreateNote} 
           submitText="Create"
           formData={createFormData}
           setFormData={setCreateFormData}
@@ -244,7 +217,6 @@ function Checklist() {
         />
       </Modal>
 
-      {/* Edit Note Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={handleEditModalClose}
@@ -252,7 +224,7 @@ function Checklist() {
         showActions={false}
       >
         <NoteForm 
-          onSubmit={updateNote} 
+          onSubmit={handleUpdateNote}
           submitText="Update"
           formData={editFormData}
           setFormData={setEditFormData}

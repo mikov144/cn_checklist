@@ -1,49 +1,27 @@
 // src/components/Header.tsx
 
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import api from "../api";
+import { useEffect } from "react";
 import { ACCESS_TOKEN } from "../constants";
 import { useUser } from "../context/UserContext";
 
-interface UserProfile {
-  id: number;
-  username: string;
-  profile: {
-    profile_picture: string | null;
-  };
-}
-
 function Header() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { refreshTrigger } = useUser();
+  const { user, loading, refreshUserData } = useUser();
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem(ACCESS_TOKEN);
-        if (!token) {
-          setLoading(false);
-          return;
-        }
+    const initializeUser = async () => {
+      const token = localStorage.getItem(ACCESS_TOKEN);
+      if (!token) return;
 
-        const response = await api.get('/api/user/');
-        setUser(response.data);
-      } catch (error) {
-        console.error('Failed to fetch user data:', error);
-      } finally {
-        setLoading(false);
-      }
+      await refreshUserData();
     };
 
-    fetchUserData();
-  }, [refreshTrigger]);
+    initializeUser();
+  }, []); // Remove refreshUserData from dependencies to prevent re-runs
 
   const handleLogout = () => {
     localStorage.clear();
-    setUser(null);
     navigate("/login");
   };
 
