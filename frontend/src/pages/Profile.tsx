@@ -80,7 +80,7 @@ function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-synth-background pl-6 pr-6 pt-6 bg-cover bg-center" style={{ backgroundImage: "url('/images/_main-background.webp')" }}>
+    <div className="min-h-screen bg-synth-background pl-2 pr-2 pt-2 bg-cover bg-center" style={{ backgroundImage: "url('/images/_main-background.webp')" }}>
       <Header />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto bg-gray-900/90 p-8 rounded-lg neon-border">

@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 function Home() {
   return (
-    <div className="min-h-screen bg-synth-background bg-cover bg-center flex flex-col pl-6 pr-6 pt-6" style={{ backgroundImage: "url('/images/_main-background.webp')"}}>
+    <div className="min-h-screen bg-synth-background bg-cover bg-center flex flex-col p-2" style={{ backgroundImage: "url('/images/_main-background.webp')"}}>
       <Header />
       <div className="flex-grow flex flex-col items-center p-6">
         <section className="max-w-4xl w-full bg-gray-900/90 rounded-lg p-8 backdrop-blur-sm shadow-lg border border-gray-800">

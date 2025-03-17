@@ -166,7 +166,7 @@ function Checklist() {
   }
 
   return (
-    <div className="min-h-screen bg-synth-background bg-cover bg-center flex flex-col pl-6 pr-6 pt-6" style={{ backgroundImage: "url('/images/_main-background.webp')"}}>
+    <div className="min-h-screen bg-synth-background bg-cover bg-center flex flex-col p-2" style={{ backgroundImage: "url('/images/_main-background.webp')"}}>
       <Header />
       <div className="flex-grow p-6">
         <div className="flex justify-between items-center mb-8">
