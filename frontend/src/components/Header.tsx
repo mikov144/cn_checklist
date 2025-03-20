@@ -69,16 +69,18 @@ function Header() {
                 <div className="flex items-center space-x-3">
                   <Link to="/profile" 
                     className="transform transition-all duration-200 hover:scale-110 active:scale-95 hover:rotate-3">
-                    <img 
-                      src={user.profile.profile_picture || "/images/_default_pfp.jpg"}
-                      alt={`${user.username}'s profile`}
-                      className="w-10 h-10 rounded-full border-2 border-synth-primary shadow-lg 
-                        transition-all duration-200 cursor-pointer
-                        hover:border-synth-secondary hover:border-3
-                        hover:shadow-[0_0_15px_rgba(139,92,246,0.5)]
-                        active:shadow-[0_0_8px_rgba(139,92,246,0.3)]
-                        active:border-synth-primary"
-                    />
+                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-synth-primary shadow-lg 
+                      transition-all duration-200 cursor-pointer
+                      hover:border-synth-secondary hover:border-3
+                      hover:shadow-[0_0_15px_rgba(139,92,246,0.5)]
+                      active:shadow-[0_0_8px_rgba(139,92,246,0.3)]
+                      active:border-synth-primary">
+                      <img 
+                        src={user.profile.profile_picture || "/images/_default_pfp.jpg"}
+                        alt={`${user.username}'s profile`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </Link>
                 </div>
                 <button

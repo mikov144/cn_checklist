@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import '../styles/toast.css';
 import api from "../api";
 import Header from "../components/Header";
 import LoadingIndicator from "../components/LoadingIndicator";
@@ -61,9 +64,24 @@ function Profile() {
 
       // Refresh user data
       await refreshUserData();
-      alert("Profile updated successfully!");
+      
+      toast.success("Profile updated successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+      });
     } catch (error) {
-      alert("Failed to update profile. Please try again.");
+      toast.error("Failed to update profile. Please try again.", {
+        position: "top-right",
+        autoClose: 5000,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+      });
     } finally {
       setUpdating(false);
     }
@@ -82,14 +100,25 @@ function Profile() {
   return (
     <div className="min-h-screen bg-synth-background pl-2 pr-2 pt-2 bg-cover bg-center" style={{ backgroundImage: "url('/images/_main-background.webp')" }}>
       <Header />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="dark"
+        className="mt-20 !z-[9999]"
+      />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto bg-gray-900/90 p-8 rounded-lg neon-border">
           <div className="flex flex-col items-center mb-8">
-            <img
-              src={user?.profile.profile_picture || "/images/_default_pfp.jpg"}
-              alt="Profile"
-              className="w-32 h-32 rounded-full border-4 border-synth-primary shadow-lg mb-4"
-            />
+            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-synth-primary shadow-lg mb-4">
+              <img
+                src={user?.profile.profile_picture || "/images/_default_pfp.jpg"}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            </div>
             <h2 className="text-3xl font-retro text-synth-primary neon-text">{user?.username}</h2>
           </div>
 
@@ -161,4 +190,4 @@ function Profile() {
   );
 }
 
-export default Profile; 
+export default Profile;
