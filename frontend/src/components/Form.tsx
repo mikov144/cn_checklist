@@ -5,6 +5,8 @@ import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import LoadingIndicator from "./LoadingIndicator";
+import FormNotification from "../helpers/notifications/FormNotification";
+import { showNotification, toastType, parseErrorMessage } from "../helpers/notifications/notificationEmitter";
 
 function Form() {
   const [method, setMethod] = useState<'login' | 'register'>('login');
@@ -54,11 +56,13 @@ function Form() {
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
         navigate("/");
       } else {
+        showNotification("Registration successful!", toastType.success);
         setMethod('login'); // Switch to login mode after successful registration
         navigate("/login");
       }
     } catch (error) {
-      alert(error);
+      const errorMessage = parseErrorMessage(error);
+      showNotification(errorMessage, toastType.error);
     } finally {
       setLoading(false);
     }
@@ -80,8 +84,16 @@ function Form() {
     }
   };
 
+  const clearProfilePicture = () => {
+    setProfilePicture(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-synth-background bg-cover bg-center" style={{ backgroundImage: "url('/images/_main-background.webp')" }}>
+      <FormNotification />
       <form onSubmit={handleSubmit} className="bg-synth-background p-8 rounded-lg neon-border max-w-md w-full bg-gray-900/90">
         <h1 className="text-4xl font-retro neon-text text-synth-primary mb-6 text-center">{name}</h1>
         <input
@@ -103,36 +115,47 @@ function Form() {
         {method === "register" && (
           <div className="mb-4">
             <label className="block text-synth-text mb-2">Choose a profile picture:</label>
-            <div className="relative">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                ref={fileInputRef}
-                className="block w-full text-synth-text cursor-pointer
-                  file:cursor-pointer
-                  file:mr-4 file:py-2.5 file:px-8
-                  file:rounded-md file:border-2
-                  file:border-synth-primary
-                  file:text-synth-primary
-                  file:bg-synth-primary/5
-                  file:font-retro
-                  file:text-sm
-                  file:shadow-[0_0_5px_rgba(139,92,246,0.3)]
-                  file:transition-all
-                  file:duration-300
-                  file:ease-out
-                  hover:file:text-pink-500
-                  hover:file:border-synth-secondary
-                  hover:file:bg-synth-primary/20
-                  hover:file:shadow-[0_0_15px_rgba(139,92,246,0.6)]
-                  active:file:bg-synth-primary/30
-                  active:file:border-synth-secondary
-                  active:file:text-pink-700
-                  active:file:shadow-[0_0_20px_rgba(139,92,246,0.8)]
-                  focus:outline-none
-                  dark:file:bg-synth-primary/10"
-              />
+            <div className="flex gap-4 items-center">
+              <div className="flex-grow">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  ref={fileInputRef}
+                  className="block w-full text-synth-text cursor-pointer
+                    file:cursor-pointer
+                    file:mr-4 file:py-2.5 file:px-8
+                    file:rounded-md file:border-2
+                    file:border-synth-primary
+                    file:text-synth-primary
+                    file:bg-synth-primary/5
+                    file:font-retro
+                    file:text-sm
+                    file:shadow-[0_0_5px_rgba(139,92,246,0.3)]
+                    file:transition-all
+                    file:duration-300
+                    file:ease-out
+                    hover:file:text-pink-500
+                    hover:file:border-synth-secondary
+                    hover:file:bg-synth-primary/20
+                    hover:file:shadow-[0_0_15px_rgba(139,92,246,0.6)]
+                    active:file:bg-synth-primary/30
+                    active:file:border-synth-secondary
+                    active:file:text-pink-700
+                    active:file:shadow-[0_0_20px_rgba(139,92,246,0.8)]
+                    focus:outline-none
+                    dark:file:bg-synth-primary/10"
+                />
+              </div>
+              {profilePicture && (
+                <button
+                  type="button"
+                  onClick={clearProfilePicture}
+                  className="button-retro py-2.5 px-4 text-sm h-[42px] flex items-center justify-center min-w-[100px]"
+                >
+                  Clear Image
+                </button>
+              )}
             </div>
           </div>
         )}

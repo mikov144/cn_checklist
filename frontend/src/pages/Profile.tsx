@@ -1,12 +1,15 @@
+// src/pages/Profile.tsx
+
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/toast.css';
 import api from "../api";
 import Header from "../components/Header";
 import LoadingIndicator from "../components/LoadingIndicator";
 import { useUser } from "../context/UserContext";
+import Notification from "../helpers/notifications/Notification";
+import { showNotification, toastType, parseErrorMessage } from "../helpers/notifications/notificationEmitter";
 
 function Profile() {
   const { user, loading: userLoading, refreshUserData } = useUser();
@@ -65,23 +68,10 @@ function Profile() {
       // Refresh user data
       await refreshUserData();
       
-      toast.success("Profile updated successfully!", {
-        position: "top-right",
-        autoClose: 3000,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark",
-      });
+      showNotification("Profile updated successfully!", toastType.success);
     } catch (error) {
-      toast.error("Failed to update profile. Please try again.", {
-        position: "top-right",
-        autoClose: 5000,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark",
-      });
+      const errorMessage = parseErrorMessage(error);
+      showNotification(errorMessage, toastType.error);
     } finally {
       setUpdating(false);
     }
@@ -93,6 +83,13 @@ function Profile() {
     }
   };
 
+  const clearProfilePicture = () => {
+    setProfilePicture(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   if (userLoading && !user) {
     return <LoadingIndicator />;
   }
@@ -100,15 +97,7 @@ function Profile() {
   return (
     <div className="min-h-screen bg-synth-background pl-2 pr-2 pt-2 bg-cover bg-center" style={{ backgroundImage: "url('/images/_main-background.webp')" }}>
       <Header />
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        closeOnClick
-        pauseOnHover
-        draggable
-        theme="dark"
-        className="mt-20 !z-[9999]"
-      />
+      <Notification />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto bg-gray-900/90 p-8 rounded-lg neon-border">
           <div className="flex flex-col items-center mb-8">
@@ -146,34 +135,47 @@ function Profile() {
 
             <div>
               <label className="block text-synth-text mb-2 text-xl">Change profile picture</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                ref={fileInputRef}
-                className="block w-full text-synth-text cursor-pointer
-                  file:cursor-pointer
-                  file:mr-4 file:py-2.5 file:px-8
-                  file:rounded-md file:border-2
-                  file:border-synth-primary
-                  file:text-synth-primary
-                  file:bg-synth-primary/5
-                  file:font-retro
-                  file:text-sm
-                  file:shadow-[0_0_5px_rgba(139,92,246,0.3)]
-                  file:transition-all
-                  file:duration-300
-                  file:ease-out
-                  hover:file:text-white
-                  hover:file:border-synth-secondary
-                  hover:file:bg-synth-primary/20
-                  hover:file:shadow-[0_0_15px_rgba(139,92,246,0.6)]
-                  active:file:bg-synth-primary/30
-                  active:file:border-synth-secondary
-                  active:file:text-white
-                  active:file:shadow-[0_0_20px_rgba(139,92,246,0.8)]
-                  focus:outline-none"
-              />
+              <div className="flex gap-4 items-center">
+                <div className="flex-grow">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    ref={fileInputRef}
+                    className="block w-full text-synth-text cursor-pointer
+                      file:cursor-pointer
+                      file:mr-4 file:py-2.5 file:px-8
+                      file:rounded-md file:border-2
+                      file:border-synth-primary
+                      file:text-synth-primary
+                      file:bg-synth-primary/5
+                      file:font-retro
+                      file:text-sm
+                      file:shadow-[0_0_5px_rgba(139,92,246,0.3)]
+                      file:transition-all
+                      file:duration-300
+                      file:ease-out
+                      hover:file:text-white
+                      hover:file:border-synth-secondary
+                      hover:file:bg-synth-primary/20
+                      hover:file:shadow-[0_0_15px_rgba(139,92,246,0.6)]
+                      active:file:bg-synth-primary/30
+                      active:file:border-synth-secondary
+                      active:file:text-white
+                      active:file:shadow-[0_0_20px_rgba(139,92,246,0.8)]
+                      focus:outline-none"
+                  />
+                </div>
+                {profilePicture && (
+                  <button
+                    type="button"
+                    onClick={clearProfilePicture}
+                    className="button-retro py-2.5 px-4 text-sm h-[42px] flex items-center justify-center min-w-[100px]"
+                  >
+                    Clear Image
+                  </button>
+                )}
+              </div>
             </div>
 
             <button

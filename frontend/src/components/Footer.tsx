@@ -8,11 +8,11 @@ function Footer() {
           {/* Tech stack info */}
           <div className="flex flex-wrap justify-center items-center gap-2 text-md font-medium text-white/90">
             <span className="text-cyan-300 font-bold neon-text">v0.98</span>
-            <span className="hidden sm:inline text-white/30">|</span>
+            <span className="hidden sm:inline text-white/90">|</span>
             <span className="text-cyan-300 font-bold neon-text">Django REST framework</span>
-            <span className="hidden sm:inline text-white/30">|</span>
+            <span className="hidden sm:inline text-white/90">|</span>
             <span className="text-cyan-300 font-bold neon-text">Vite + React + TypeScript</span>
-            <span className="hidden sm:inline text-white/30">|</span>
+            <span className="hidden sm:inline text-white/90">|</span>
             <span className="text-cyan-300 font-bold neon-text">Postgresql</span>
           </div>
 
