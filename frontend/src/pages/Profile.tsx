@@ -101,7 +101,7 @@ function Profile() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto bg-gray-900/90 p-8 rounded-lg neon-border">
           <div className="flex flex-col items-center mb-8">
-            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-synth-primary shadow-lg mb-4">
+            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-synth-primary shadow-lg mb-4 border-gray-500">
               <img
                 src={user?.profile.profile_picture || "/images/_default_pfp.jpg"}
                 alt="Profile"
