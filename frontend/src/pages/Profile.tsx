@@ -15,7 +15,8 @@ function Profile() {
   const { user, loading: userLoading, refreshUserData } = useUser();
   const [updating, setUpdating] = useState(false);
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -40,6 +41,29 @@ function Profile() {
     }
   }, [user]);
 
+  const handlePasswordChange = async () => {
+    if (!oldPassword || !newPassword) {
+      showNotification("Both old and new passwords are required", toastType.error);
+      return;
+    }
+
+    try {
+      await api.put('/api/user/change-password/', {
+        old_password: oldPassword,
+        new_password: newPassword
+      });
+
+      // Reset password fields
+      setOldPassword("");
+      setNewPassword("");
+      
+      showNotification("Password updated successfully!", toastType.success);
+    } catch (error) {
+      const errorMessage = parseErrorMessage(error);
+      showNotification(errorMessage, toastType.error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setUpdating(true);
@@ -47,9 +71,6 @@ function Profile() {
     try {
       const formData = new FormData();
       formData.append("username", username);
-      if (password) {
-        formData.append("password", password);
-      }
       if (profilePicture) {
         formData.append("profile.profile_picture", profilePicture);
       }
@@ -58,8 +79,7 @@ function Profile() {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
-      // Reset password field and file input
-      setPassword("");
+      // Reset file input
       setProfilePicture(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -101,36 +121,56 @@ function Profile() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto bg-gray-900/90 p-8 rounded-lg neon-border">
           <div className="flex flex-col items-center mb-8">
-            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-synth-primary shadow-lg mb-4 border-gray-500">
+            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-500 shadow-lg mb-4">
               <img
                 src={user?.profile.profile_picture || "/images/_default_pfp.jpg"}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
             </div>
-            <h2 className="text-3xl font-retro text-synth-primary neon-text">{user?.username}</h2>
+            <h2 className="text-4xl font-retro text-synth-primary neon-text">{user?.username}</h2>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-synth-text mb-2 text-xl">New username</label>
+              <label className="block text-synth-text mb-2 text-2xl">New username</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="block w-full p-3 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
+                className="block w-full p-3 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-xl"
                 required
               />
             </div>
 
-            <div>
-              <label className="block text-synth-text mb-2 text-xl">New password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="block w-full p-3 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
-              />
+            <div className="space-y-4">
+              <h3 className="text-2xl text-synth-text">Change Password</h3>
+              <div>
+                <input
+                  type="password"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  className="block w-full p-3 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
+                  placeholder="Enter your current password"
+                />
+              </div>
+              <div>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="block w-full p-3 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
+                  placeholder="Enter your new password"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handlePasswordChange}
+                disabled={!oldPassword || !newPassword}
+                className="button-retro w-full py-2 rounded text-lg disabled:opacity-50"
+              >
+                Update Password
+              </button>
             </div>
 
             <div>
