@@ -15,7 +15,7 @@ const FormNotification = () => {
       pauseOnHover
       theme="dark"
       closeButton
-      style={{ marginTop: '3rem' }} // Adjust the marginTop value as needed
+      style={{ marginTop: '2rem' }} // Adjust the marginTop value as needed
     />
   );
 }

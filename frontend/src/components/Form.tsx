@@ -11,7 +11,11 @@ import { showNotification, toastType, parseErrorMessage } from "../helpers/notif
 function Form() {
   const [method, setMethod] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState("");
+  const [usernameError, setUsernameError] = useState<string | null>(null);
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -19,10 +23,42 @@ function Form() {
 
   const name = method === "login" ? "Login" : "Register";
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setLoading(true);
-    e.preventDefault();
+  const validateForm = () => {
+    let isValid = true;
+    
+    setUsernameError(null);
+    setPasswordError(null);
+    setConfirmPasswordError(null);
 
+    if (!username.trim()) {
+      setUsernameError("Username is required");
+      isValid = false;
+    }
+
+    if (!password) {
+      setPasswordError("Password is required");
+      isValid = false;
+    } else if (method === 'register' && password.length < 6) {
+      setPasswordError("Password must be at least 6 characters long");
+      isValid = false;
+    }
+
+    if (method === 'register' && password !== confirmPassword) {
+      setConfirmPasswordError("Passwords do not match");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
     const route = method === "login" ? "/api/token/" : "/api/user/register/";
 
     try {
@@ -46,6 +82,7 @@ function Form() {
       // Reset form on successful submission
       setUsername("");
       setPassword("");
+      setConfirmPassword("");
       setProfilePicture(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -77,7 +114,11 @@ function Form() {
   const toggleMethod = () => {
     setMethod(method === 'login' ? 'register' : 'login');
     setUsername("");
+    setUsernameError(null);
     setPassword("");
+    setConfirmPassword("");
+    setPasswordError(null);
+    setConfirmPasswordError(null);
     setProfilePicture(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -97,21 +138,51 @@ function Form() {
       <form onSubmit={handleSubmit} className="bg-synth-background p-8 rounded-lg neon-border max-w-md w-full bg-gray-900/90">
         <h1 className="text-4xl font-retro neon-text text-synth-primary mb-6 text-center">{name}</h1>
         <input
-          className="block w-full p-3 border border-synth-primary rounded mb-4 bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
+          className="block w-full p-3 border border-synth-primary rounded mb-2 bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
           type="text"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => {
+            setUsername(e.target.value);
+            setUsernameError(null);
+          }}
           placeholder="Username"
           required
         />
+        <p className={`h-5 text-red-400 text-sm mb-4 ml-1 transition-opacity duration-200 ${!usernameError ? "invisible" : ""}`}>
+          {usernameError}
+        </p>
         <input
-          className="block w-full p-3 border border-synth-primary rounded mb-4 bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
+          className="block w-full p-3 border border-synth-primary rounded mb-2 bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setPasswordError(null);
+          }}
           placeholder="Password"
           required
         />
+        <p className={`h-5 text-red-400 text-sm mb-4 ml-1 transition-opacity duration-200 ${!passwordError ? "invisible" : ""}`}>
+          {passwordError}
+        </p>
+        {method === "register" && (
+          <>
+            <input
+              className="block w-full p-3 border border-synth-primary rounded mb-2 bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                setConfirmPasswordError(null);
+              }}
+              placeholder="Confirm Password"
+              required
+            />
+            <p className={`h-5 text-red-400 text-sm mb-4 ml-1 transition-opacity duration-200 ${!confirmPasswordError ? "invisible" : ""}`}>
+              {confirmPasswordError}
+            </p>
+          </>
+        )}
         {method === "register" && (
           <div className="mb-4">
             <label className="block text-synth-text mb-2">Choose a profile picture:</label>

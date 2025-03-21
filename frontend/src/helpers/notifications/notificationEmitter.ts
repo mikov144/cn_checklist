@@ -14,32 +14,36 @@ export const showNotification = (message: string, type: toastType) => {
 };
 
 export const parseErrorMessage = (error: any): string => {
-  // If the error response has data property (axios error)
-  if (error.response?.data) {
-    const data = error.response.data;
-    
-    // If the response is a string, return it directly
-    if (typeof data === 'string') return data;
-    
-    // If the response is an object, collect all error messages
-    if (typeof data === 'object') {
-      const messages: string[] = [];
-      
-      Object.entries(data).forEach(([_, errors]) => {
-        // Handle array of errors
-        if (Array.isArray(errors)) {
-          messages.push(`${errors.join(', ')}`);
+  if (!error.response?.data) {
+    return 'An error occurred. Please try again.';
+  }
+
+  const data = error.response.data;
+  
+  // If it's a string, return it directly
+  if (typeof data === 'string') return data;
+  
+  // If it's an object, find the first error message
+  if (typeof data === 'object') {
+    const findFirstError = (obj: any): string | null => {
+      for (const value of Object.values(obj)) {
+        if (Array.isArray(value)) {
+          return value[0];
         }
-        // Handle single string error
-        else if (typeof errors === 'string') {
-          messages.push(`${errors}`);
+        if (typeof value === 'string') {
+          return value;
         }
-      });
-      
-      return messages.join('\n');
-    }
+        if (typeof value === 'object' && value !== null) {
+          const nestedError = findFirstError(value);
+          if (nestedError) return nestedError;
+        }
+      }
+      return null;
+    };
+
+    const message = findFirstError(data);
+    return message || 'An error occurred. Please try again.';
   }
   
-  // Fallback error message
   return 'An error occurred. Please try again.';
 };
