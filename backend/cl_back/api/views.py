@@ -2,8 +2,8 @@ from django.contrib.auth.models import User
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserCreateSerializer, UserUpdateSerializer, NoteSerializer, ChangePasswordSerializer
-from .models import Note
+from .serializers import UserCreateSerializer, UserUpdateSerializer, NoteSerializer, ChangePasswordSerializer, CategorySerializer
+from .models import Note, Category
 
 class NoteListCreate(generics.ListCreateAPIView):
     serializer_class = NoteSerializer
@@ -11,7 +11,7 @@ class NoteListCreate(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Note.objects.filter(author=user)
+        return Note.objects.filter(author=user).order_by('order')
 
     def perform_create(self, serializer):
         if serializer.is_valid():
@@ -34,6 +34,45 @@ class NoteUpdate(generics.UpdateAPIView):
     def get_queryset(self):
         user = self.request.user
         return Note.objects.filter(author=user)
+
+class NoteOrderUpdate(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        ordering = request.data.get('ordering', [])
+        for order, note_id in enumerate(ordering):
+            Note.objects.filter(id=note_id, author=request.user).update(order=order)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class CategoryListCreate(generics.ListCreateAPIView):
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Category.objects.filter(user=user)
+
+    def perform_create(self, serializer):
+        if serializer.is_valid():
+            serializer.save(user=self.request.user)
+        else:
+            print(serializer.errors)
+
+class CategoryDelete(generics.DestroyAPIView):
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Category.objects.filter(user=user)
+
+class CategoryUpdate(generics.UpdateAPIView):
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Category.objects.filter(user=user)
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()

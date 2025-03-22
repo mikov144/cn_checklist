@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
 from rest_framework import serializers
-from .models import Note, Profile
+from .models import Note, Profile, Category
 
 
 def validate_image_size(image):
@@ -55,10 +55,15 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
         return instance
 
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["id", "title"]
+
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ["id", "title", "content", "created_at", "author"]
+        fields = ["id", "content", "created_at", "author", "category", "order", "scratched_out"]
         extra_kwargs = {"author": {"read_only": True}}
 
 class ChangePasswordSerializer(serializers.Serializer):
