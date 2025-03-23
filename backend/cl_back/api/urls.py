@@ -6,6 +6,7 @@ urlpatterns = [
     path("notes/delete/<int:pk>/", views.NoteDelete.as_view(), name="delete-note"),
     path("notes/update/<int:pk>/", views.NoteUpdate.as_view(), name="update-note"),
     path("notes/order/", views.NoteOrderUpdate.as_view(), name="update-note-order"),
+    path("notes/reset-order/", views.NoteResetOrder.as_view(), name="reset-note-order"),
     path("categories/", views.CategoryListCreate.as_view(), name="category-list"),
     path("categories/delete/<int:pk>/", views.CategoryDelete.as_view(), name="delete-category"),
     path("categories/update/<int:pk>/", views.CategoryUpdate.as_view(), name="update-category"),

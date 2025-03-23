@@ -44,6 +44,21 @@ class NoteOrderUpdate(APIView):
             Note.objects.filter(id=note_id, author=request.user).update(order=order)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class NoteResetOrder(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        category_id = request.data.get('category_id')
+        if not category_id:
+            return Response({"error": "category_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        notes = Note.objects.filter(category_id=category_id, author=request.user).order_by('created_at')
+        for order, note in enumerate(notes):
+            note.order = order + 1
+            note.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 class CategoryListCreate(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
     permission_classes = [permissions.IsAuthenticated]
