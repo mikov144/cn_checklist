@@ -13,6 +13,7 @@ interface NotesContextType {
   updateNote: (id: number, content: string) => Promise<void>;
   toggleNoteScratchOut: (id: number, scratched_out: boolean) => Promise<void>;
   deleteNote: (id: number) => Promise<void>;
+  reorderNotes: (noteIds: number[]) => Promise<void>;
 }
 
 const NotesContext = createContext<NotesContextType | null>(null);
@@ -107,6 +108,20 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     }
   }, [refreshNotes]);
 
+  const reorderNotes = useCallback(async (noteIds: number[]) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await api.post('/api/notes/order/', { ordering: noteIds });
+      await refreshNotes();
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [refreshNotes]);
+
   return (
     <NotesContext.Provider value={{ 
       notes, 
@@ -116,7 +131,8 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       createNote, 
       updateNote,
       toggleNoteScratchOut,
-      deleteNote 
+      deleteNote,
+      reorderNotes 
     }}>
       {children}
     </NotesContext.Provider>

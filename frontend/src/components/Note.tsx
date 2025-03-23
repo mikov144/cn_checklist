@@ -21,9 +21,15 @@ function Note({ note, onDelete, onEdit, onToggleScratchOut }: NoteComponentProps
   const formattedDate = new Date(note.created_at).toLocaleDateString("en-US");
 
   return (
-    <div className="bg-synth-background p-6 rounded-lg neon-border mb-4 bg-gray-900/90">
+    <div className="bg-synth-background p-6 rounded-lg neon-border mb-4 bg-gray-900/90 group">
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-4">
+          {/* Drag handle visual indicator */}
+          <div className="cursor-grab active:cursor-grabbing opacity-50 group-hover:opacity-100 transition-opacity">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-synth-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9h8M8 15h8" />
+            </svg>
+          </div>
           <input
             type="checkbox"
             checked={note.scratched_out}

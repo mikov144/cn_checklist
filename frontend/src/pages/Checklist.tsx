@@ -1,6 +1,7 @@
 // src/pages/Checklist.tsx
 
 import { useState, useEffect, useCallback } from "react";
+import { DragDropContext, Droppable, Draggable, DropResult, DroppableProvided, DraggableProvided } from "@hello-pangea/dnd";
 import Note, { NoteProps } from "../components/Note";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -81,7 +82,8 @@ function Checklist() {
     createNote: createNoteApi, 
     updateNote: updateNoteApi, 
     deleteNote: deleteNoteApi,
-    toggleNoteScratchOut
+    toggleNoteScratchOut,
+    reorderNotes
   } = useNotes();
   const { 
     categories, 
@@ -173,6 +175,44 @@ function Checklist() {
 
   const filteredNotes = notes.filter(note => note.category === selectedCategory?.id);
 
+  const handleDragEnd = async (result: DropResult) => {
+    if (!result.destination || !selectedCategory) return;
+
+    // Create a new array with all notes
+    const allNotes = Array.from(notes);
+    
+    // Get the source and destination notes
+    const sourceNote = filteredNotes[result.source.index];
+    const destinationNote = filteredNotes[result.destination.index];
+    if (!sourceNote || !destinationNote) return;
+    
+    // Find the actual indices in the full notes array
+    const sourceIndex = allNotes.findIndex(note => note.id === sourceNote.id);
+    const destinationIndex = allNotes.findIndex(note => note.id === destinationNote.id);
+    if (sourceIndex === -1 || destinationIndex === -1) return;
+    
+    // Remove the source note
+    const [movedNote] = allNotes.splice(sourceIndex, 1);
+    
+    // Insert at the correct position
+    // When moving upward (destination < source), insert at the destination index
+    // When moving downward (destination > source), insert after the destination index
+    const insertIndex = destinationIndex > sourceIndex 
+      ? destinationIndex 
+      : destinationIndex;
+    
+    allNotes.splice(insertIndex, 0, movedNote);
+    
+    // Get all note IDs in their new order
+    const newOrder = allNotes.map(note => note.id);
+    
+    try {
+      await reorderNotes(newOrder);
+    } catch (error) {
+      alert("Failed to reorder notes: " + error);
+    }
+  };
+
   if ((notesLoading && notes.length === 0) || (categoriesLoading && categories.length === 0)) {
     return <LoadingIndicator />;
   }
@@ -202,27 +242,51 @@ function Checklist() {
             Create Note
           </button>
         </div>
-        <div className="notes-section mb-8">
-          {filteredNotes.map((note) => (
-            <Note 
-              note={note} 
-              onDelete={handleDeleteClick}
-              onEdit={() => handleEditClick(note)}
-              onToggleScratchOut={toggleNoteScratchOut}
-              key={note.id} 
-            />
-          ))}
-          {selectedCategory && filteredNotes.length === 0 && (
-            <p className="text-synth-secondary text-center py-8">
-              No notes in this category yet. Create one to get started!
-            </p>
-          )}
-          {!selectedCategory && (
-            <p className="text-synth-secondary text-center py-8">
-              Please select a category to view or create notes.
-            </p>
-          )}
-        </div>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="notes">
+            {(provided: DroppableProvided) => (
+              <div 
+                className="notes-section mb-8"
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+              >
+                {filteredNotes.map((note, index) => (
+                  <Draggable 
+                    key={note.id} 
+                    draggableId={note.id.toString()} 
+                    index={index}
+                  >
+                    {(provided: DraggableProvided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <Note 
+                          note={note} 
+                          onDelete={handleDeleteClick}
+                          onEdit={() => handleEditClick(note)}
+                          onToggleScratchOut={toggleNoteScratchOut}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+                {selectedCategory && filteredNotes.length === 0 && (
+                  <p className="text-synth-secondary text-center py-8">
+                    No notes in this category yet. Create one to get started!
+                  </p>
+                )}
+                {!selectedCategory && (
+                  <p className="text-synth-secondary text-center py-8">
+                    Please select a category to view or create notes.
+                  </p>
+                )}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       </div>
       <Footer />
 
