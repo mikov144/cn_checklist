@@ -1,3 +1,5 @@
+// src/context/NotesContext.tsx
+
 import { createContext, useContext, useState, ReactNode, useCallback, useRef } from 'react';
 import api from '../api';
 import { NoteProps } from '../components/Note';
@@ -7,8 +9,9 @@ interface NotesContextType {
   loading: boolean;
   error: Error | null;
   refreshNotes: () => Promise<void>;
-  createNote: (title: string, content: string) => Promise<void>;
-  updateNote: (id: number, title: string, content: string) => Promise<void>;
+  createNote: (content: string, category: number) => Promise<void>;
+  updateNote: (id: number, content: string) => Promise<void>;
+  toggleNoteScratchOut: (id: number, scratched_out: boolean) => Promise<void>;
   deleteNote: (id: number) => Promise<void>;
 }
 
@@ -32,7 +35,9 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       
       // Create and store the new request
       const request = api.get('/api/notes/').then(response => {
-        setNotes(response.data);
+        // Sort notes by order
+        const sortedNotes = [...response.data].sort((a, b) => a.order - b.order);
+        setNotes(sortedNotes);
       });
       pendingRequest.current = request;
 
@@ -46,11 +51,11 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const createNote = useCallback(async (title: string, content: string) => {
+  const createNote = useCallback(async (content: string, category: number) => {
     try {
       setLoading(true);
       setError(null);
-      await api.post('/api/notes/', { title, content });
+      await api.post('/api/notes/', { content, category });
       await refreshNotes();
     } catch (err) {
       setError(err as Error);
@@ -60,11 +65,25 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     }
   }, [refreshNotes]);
 
-  const updateNote = useCallback(async (id: number, title: string, content: string) => {
+  const updateNote = useCallback(async (id: number, content: string) => {
     try {
       setLoading(true);
       setError(null);
-      await api.put(`/api/notes/update/${id}/`, { title, content });
+      await api.patch(`/api/notes/update/${id}/`, { content });
+      await refreshNotes();
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [refreshNotes]);
+
+  const toggleNoteScratchOut = useCallback(async (id: number, scratched_out: boolean) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await api.patch(`/api/notes/update/${id}/`, { scratched_out });
       await refreshNotes();
     } catch (err) {
       setError(err as Error);
@@ -95,7 +114,8 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       error, 
       refreshNotes, 
       createNote, 
-      updateNote, 
+      updateNote,
+      toggleNoteScratchOut,
       deleteNote 
     }}>
       {children}

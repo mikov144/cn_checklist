@@ -7,9 +7,10 @@ import Footer from "../components/Footer";
 import Modal from "../components/Modal";
 import LoadingIndicator from "../components/LoadingIndicator";
 import { useNotes } from "../context/NotesContext";
+import { useCategories } from "../context/CategoriesContext";
+import CategoryTabs from "../components/CategoryTabs";
 
 interface FormData {
-  title: string;
   content: string;
 }
 
@@ -30,21 +31,6 @@ const NoteForm = ({
 }: NoteFormProps) => (
   <form onSubmit={onSubmit} className="space-y-4">
     <div>
-      <label htmlFor="title" className="block text-synth-secondary neon-text mb-2">
-        Title:
-      </label>
-      <input
-        type="text"
-        id="title"
-        name="title"
-        required
-        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-        value={formData.title}
-        className="w-full p-2 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary"
-      />
-    </div>
-
-    <div>
       <label htmlFor="content" className="block text-synth-secondary neon-text mb-2">
         Content:
       </label>
@@ -53,7 +39,7 @@ const NoteForm = ({
         name="content"
         required
         value={formData.content}
-        onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+        onChange={(e) => setFormData({ content: e.target.value })}
         className="w-full p-2 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary"
         rows={4}
       />
@@ -88,21 +74,41 @@ const NoteForm = ({
 );
 
 function Checklist() {
-  const { notes, loading, refreshNotes, createNote: createNoteApi, updateNote: updateNoteApi, deleteNote: deleteNoteApi } = useNotes();
+  const { 
+    notes, 
+    loading: notesLoading, 
+    refreshNotes, 
+    createNote: createNoteApi, 
+    updateNote: updateNoteApi, 
+    deleteNote: deleteNoteApi,
+    toggleNoteScratchOut
+  } = useNotes();
+  const { 
+    categories, 
+    selectedCategory,
+    loading: categoriesLoading,
+    refreshCategories,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+    setSelectedCategory
+  } = useCategories();
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState<number | null>(null);
   const [noteToEdit, setNoteToEdit] = useState<NoteProps | null>(null);
-  const [createFormData, setCreateFormData] = useState<FormData>({ title: "", content: "" });
-  const [editFormData, setEditFormData] = useState<FormData>({ title: "", content: "" });
+  const [createFormData, setCreateFormData] = useState<FormData>({ content: "" });
+  const [editFormData, setEditFormData] = useState<FormData>({ content: "" });
 
   useEffect(() => {
-    const initializeNotes = async () => {
+    const initialize = async () => {
+      await refreshCategories();
       await refreshNotes();
     };
-    initializeNotes();
-  }, []); // Remove refreshNotes from dependencies to prevent re-runs
+    initialize();
+  }, []); // Remove refreshNotes and refreshCategories from dependencies to prevent re-runs
 
   const handleDeleteClick = useCallback((id: number) => {
     setNoteToDelete(id);
@@ -111,7 +117,7 @@ function Checklist() {
 
   const handleEditClick = useCallback((note: NoteProps) => {
     setNoteToEdit(note);
-    setEditFormData({ title: note.title, content: note.content });
+    setEditFormData({ content: note.content });
     setIsEditModalOpen(true);
   }, []);
 
@@ -128,9 +134,13 @@ function Checklist() {
 
   const handleCreateNote = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedCategory) {
+      alert("Please select a category first");
+      return;
+    }
     try {
-      await createNoteApi(createFormData.title, createFormData.content);
-      setCreateFormData({ title: "", content: "" });
+      await createNoteApi(createFormData.content, selectedCategory.id);
+      setCreateFormData({ content: "" });
       setIsCreateModalOpen(false);
     } catch (error) {
       alert("Failed to create note: " + error);
@@ -141,8 +151,8 @@ function Checklist() {
     e.preventDefault();
     if (!noteToEdit) return;
     try {
-      await updateNoteApi(noteToEdit.id, editFormData.title, editFormData.content);
-      setEditFormData({ title: "", content: "" });
+      await updateNoteApi(noteToEdit.id, editFormData.content);
+      setEditFormData({ content: "" });
       setIsEditModalOpen(false);
       setNoteToEdit(null);
     } catch (error) {
@@ -152,16 +162,18 @@ function Checklist() {
 
   const handleCreateModalClose = useCallback(() => {
     setIsCreateModalOpen(false);
-    setCreateFormData({ title: "", content: "" });
+    setCreateFormData({ content: "" });
   }, []);
 
   const handleEditModalClose = useCallback(() => {
     setIsEditModalOpen(false);
-    setEditFormData({ title: "", content: "" });
+    setEditFormData({ content: "" });
     setNoteToEdit(null);
   }, []);
 
-  if (loading && notes.length === 0) {
+  const filteredNotes = notes.filter(note => note.category === selectedCategory?.id);
+
+  if ((notesLoading && notes.length === 0) || (categoriesLoading && categories.length === 0)) {
     return <LoadingIndicator />;
   }
 
@@ -169,26 +181,47 @@ function Checklist() {
     <div className="min-h-screen bg-synth-background bg-cover bg-center flex flex-col p-2" style={{ backgroundImage: "url('/images/_main-background.webp')"}}>
       <Header />
       <div className="flex-grow p-6">
+        <CategoryTabs
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+          onCreateCategory={createCategory}
+          onUpdateCategory={updateCategory}
+          onDeleteCategory={deleteCategory}
+        />
+
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-4xl font-retro neon-text text-synth-primary">
-            Notes
+            Notes {selectedCategory ? `- ${selectedCategory.title}` : ''}
           </h2>
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="button-retro px-6 py-2 rounded font-retro flex items-center text-lg"
+            disabled={!selectedCategory}
           >
             Create Note
           </button>
         </div>
         <div className="notes-section mb-8">
-          {notes.map((note) => (
+          {filteredNotes.map((note) => (
             <Note 
               note={note} 
               onDelete={handleDeleteClick}
               onEdit={() => handleEditClick(note)}
+              onToggleScratchOut={toggleNoteScratchOut}
               key={note.id} 
             />
           ))}
+          {selectedCategory && filteredNotes.length === 0 && (
+            <p className="text-synth-secondary text-center py-8">
+              No notes in this category yet. Create one to get started!
+            </p>
+          )}
+          {!selectedCategory && (
+            <p className="text-synth-secondary text-center py-8">
+              Please select a category to view or create notes.
+            </p>
+          )}
         </div>
       </div>
       <Footer />

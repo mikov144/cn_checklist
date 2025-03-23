@@ -1,25 +1,42 @@
 // src/components/Note.tsx
 
 export interface NoteProps {
-  created_at: string;
-  title: string;
-  content: string;
   id: number;
+  content: string;
+  created_at: string;
+  author: number;
+  category: number;
+  order: number;
+  scratched_out: boolean;
 }
 
 interface NoteComponentProps {
   note: NoteProps;
   onDelete: (id: number) => void;
   onEdit: (note: NoteProps) => void;
+  onToggleScratchOut: (id: number, scratched_out: boolean) => void;
 }
 
-function Note({ note, onDelete, onEdit }: NoteComponentProps) {
+function Note({ note, onDelete, onEdit, onToggleScratchOut }: NoteComponentProps) {
   const formattedDate = new Date(note.created_at).toLocaleDateString("en-US");
 
   return (
     <div className="bg-synth-background p-6 rounded-lg neon-border mb-4 bg-gray-900/90">
       <div className="flex justify-between items-start mb-4">
-        <h3 className="text-3xl font-retro text-synth-primary neon-text">{note.title}</h3>
+        <div className="flex items-center gap-4">
+          <input
+            type="checkbox"
+            checked={note.scratched_out}
+            onChange={() => onToggleScratchOut(note.id, !note.scratched_out)}
+            className="w-5 h-5 rounded border-synth-primary text-synth-primary focus:ring-synth-secondary
+              cursor-pointer transition-all duration-200
+              hover:border-pink-500 hover:ring-2 hover:ring-pink-500/30"
+          />
+          <p className={`text-xl font-retro text-synth-text whitespace-pre-wrap
+            ${note.scratched_out ? 'line-through text-synth-secondary' : ''}`}>
+            {note.content}
+          </p>
+        </div>
         <div className="flex space-x-2">
           <button
             onClick={() => onEdit(note)}
@@ -57,8 +74,7 @@ function Note({ note, onDelete, onEdit }: NoteComponentProps) {
           </button>
         </div>
       </div>
-      <p className="text-synth-text whitespace-pre-wrap text-xl">{note.content}</p>
-      <p className="text-synth-secondary neon-text mb-4 text-lg">{formattedDate}</p>
+      <p className="text-synth-secondary neon-text text-sm">{formattedDate}</p>
     </div>
   );
 }
