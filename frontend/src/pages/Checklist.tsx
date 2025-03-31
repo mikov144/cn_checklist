@@ -246,7 +246,7 @@ function Checklist() {
           <Droppable droppableId="notes">
             {(provided: DroppableProvided) => (
               <div 
-                className="notes-section mb-8"
+                className="bg-synth-background p-6 rounded-lg neon-border mb-4 bg-gray-900/90 bg-synth-background/95 border border-synth-primary/30 overflow-hidden"
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
@@ -264,6 +264,7 @@ function Checklist() {
                       >
                         <Note 
                           note={note} 
+                          index={index}
                           onDelete={handleDeleteClick}
                           onEdit={() => handleEditClick(note)}
                           onToggleScratchOut={toggleNoteScratchOut}
