@@ -40,7 +40,7 @@ class NoteOrderUpdate(APIView):
 
     def post(self, request, *args, **kwargs):
         ordering = request.data.get('ordering', [])
-        for order, note_id in enumerate(ordering):
+        for order, note_id in enumerate(ordering, start=1):  # Start from 1 instead of 0
             Note.objects.filter(id=note_id, author=request.user).update(order=order)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -53,8 +53,8 @@ class NoteResetOrder(APIView):
             return Response({"error": "category_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         notes = Note.objects.filter(category_id=category_id, author=request.user).order_by('created_at')
-        for order, note in enumerate(notes):
-            note.order = order + 1
+        for order, note in enumerate(notes, start=1):  # Start from 1 here as well
+            note.order = order
             note.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
