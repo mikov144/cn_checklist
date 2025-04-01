@@ -72,7 +72,7 @@ export default function CategoryTabs({
               onClick={() => onSelectCategory(category)}
               className={`px-4 py-2 rounded-t-lg font-retro transition-all duration-200
                 ${selectedCategory?.id === category.id
-                  ? 'bg-synth-primary text-synth-background'
+                  ? 'bg-synth-primary text-synth-background shadow-[0_0_10px_rgba(255,0,255,0.5)] border-b-2 border-pink-500'
                   : 'text-synth-primary hover:text-pink-500 hover:bg-synth-primary/10'
                 }`}
             >
@@ -134,7 +134,17 @@ export default function CategoryTabs({
             <button
               type="button"
               onClick={() => setIsCreateModalOpen(false)}
-              className="px-4 py-2 rounded border-2 border-synth-primary text-synth-primary font-retro"
+              className="px-4 py-2 rounded border-2 border-synth-primary text-synth-primary
+                transition-all duration-200 font-retro
+                hover:text-pink-500 hover:border-pink-500
+                hover:bg-synth-primary/10 
+                hover:shadow-[0_0_15px_rgba(255,0,255,0.3)]
+                hover:scale-105
+                active:scale-95
+                active:bg-synth-primary/20
+                active:text-pink-700
+                active:border-pink-700
+                active:shadow-[0_0_8px_rgba(255,0,255,0.2)]"
             >
               Cancel
             </button>
@@ -179,7 +189,17 @@ export default function CategoryTabs({
                 setIsEditModalOpen(false);
                 setCategoryToEdit(null);
               }}
-              className="px-4 py-2 rounded border-2 border-synth-primary text-synth-primary font-retro"
+              className="px-4 py-2 rounded border-2 border-synth-primary text-synth-primary
+                transition-all duration-200 font-retro
+                hover:text-pink-500 hover:border-pink-500
+                hover:bg-synth-primary/10 
+                hover:shadow-[0_0_15px_rgba(255,0,255,0.3)]
+                hover:scale-105
+                active:scale-95
+                active:bg-synth-primary/20
+                active:text-pink-700
+                active:border-pink-700
+                active:shadow-[0_0_8px_rgba(255,0,255,0.2)]"
             >
               Cancel
             </button>

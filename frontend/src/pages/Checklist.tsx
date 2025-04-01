@@ -221,19 +221,7 @@ function Checklist() {
     <div className="min-h-screen bg-synth-background bg-cover bg-center flex flex-col p-2" style={{ backgroundImage: "url('/images/_main-background.webp')"}}>
       <Header />
       <div className="flex-grow p-6">
-        <CategoryTabs
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-          onCreateCategory={createCategory}
-          onUpdateCategory={updateCategory}
-          onDeleteCategory={deleteCategory}
-        />
-
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-4xl font-retro neon-text text-synth-primary">
-            Notes {selectedCategory ? `- ${selectedCategory.title}` : ''}
-          </h2>
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="button-retro px-6 py-2 rounded font-retro flex items-center text-lg"
@@ -242,6 +230,14 @@ function Checklist() {
             Create Note
           </button>
         </div>
+        <CategoryTabs
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+          onCreateCategory={createCategory}
+          onUpdateCategory={updateCategory}
+          onDeleteCategory={deleteCategory}
+        />
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="notes">
             {(provided: DroppableProvided) => (
