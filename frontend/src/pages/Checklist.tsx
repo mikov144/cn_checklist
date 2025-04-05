@@ -256,7 +256,6 @@ function Checklist() {
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        {...provided.dragHandleProps}
                       >
                         <Note 
                           note={note} 
@@ -264,6 +263,7 @@ function Checklist() {
                           onDelete={handleDeleteClick}
                           onEdit={() => handleEditClick(note)}
                           onToggleScratchOut={toggleNoteScratchOut}
+                          dragHandleProps={provided.dragHandleProps}
                         />
                       </div>
                     )}

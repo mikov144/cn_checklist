@@ -18,14 +18,15 @@ interface NoteComponentProps {
   onDelete: (id: number) => void;
   onEdit: (note: NoteProps) => void;
   onToggleScratchOut: (id: number, scratched_out: boolean) => void;
+  dragHandleProps?: any;
 }
 
-function Note({ note, index, onDelete, onEdit, onToggleScratchOut }: NoteComponentProps) {
+function Note({ note, index, onDelete, onEdit, onToggleScratchOut, dragHandleProps }: NoteComponentProps) {
   return (
     <div className="flex items-center justify-between py-3 px-4 border-b border-synth-primary/30 group hover:bg-synth-primary/5 transition-colors">
       <div className="flex items-center gap-4 flex-grow">
-        {/* Drag handle */}
-        <div className="cursor-grab active:cursor-grabbing opacity-50 group-hover:opacity-100 transition-opacity">
+        {/* Drag handle - only this part gets dragHandleProps */}
+        <div {...dragHandleProps} className="cursor-grab active:cursor-grabbing opacity-50 group-hover:opacity-100 transition-opacity">
           <Bars2Icon className="h-5 w-5 text-synth-primary" />
         </div>
 
@@ -53,14 +54,16 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut }: NoteCompone
       <div className="flex space-x-2">
         <button
           onClick={() => onEdit(note)}
-          className="p-2 text-synth-primary hover:text-pink-500 transition-colors"
+          className="p-2 text-synth-primary hover:text-pink-500 transition-colors
+            active:opacity-70 active:scale-95 active:text-pink-600"
           title="Edit note"
         >
           <PencilSquareIcon className="h-5 w-5" />
         </button>
         <button
           onClick={() => onDelete(note.id)}
-          className="p-2 text-red-500 hover:text-red-400 transition-colors"
+          className="p-2 text-red-500 hover:text-red-400 transition-colors
+            active:opacity-70 active:scale-95 active:text-red-600"
           title="Delete note"
         >
           <TrashIcon className="h-5 w-5" />

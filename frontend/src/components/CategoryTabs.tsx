@@ -86,8 +86,8 @@ export default function CategoryTabs({
                 }}
                 className={`p-1 transition-colors ${
                   selectedCategory?.id === category.id
-                    ? 'text-synth-secondary hover:text-pink-500'
-                    : 'text-gray-400 hover:text-gray-200'
+                    ? 'text-synth-secondary hover:text-pink-500 active:opacity-70 active:scale-95 active:text-pink-600'
+                    : 'text-gray-400 hover:text-gray-200 active:opacity-70 active:scale-95 active:text-gray-300'
                 }`}
               >
                 <PencilSquareIcon className="w-5 h-5" />
@@ -100,8 +100,8 @@ export default function CategoryTabs({
                 }}
                 className={`p-1 transition-colors ${
                   selectedCategory?.id === category.id
-                    ? 'text-red-500 hover:text-red-400'
-                    : 'text-red-400/50 hover:text-red-400'
+                    ? 'text-red-500 hover:text-red-400 active:opacity-70 active:scale-95 active:text-red-600'
+                    : 'text-red-400/50 hover:text-red-400 active:opacity-70 active:scale-95 active:text-red-500'
                 }`}
               >
                 <TrashIcon className="w-5 h-5" />
@@ -115,7 +115,11 @@ export default function CategoryTabs({
             transition-all duration-200 font-retro
             hover:text-[#33f06b] hover:border-[#33f06b]
             hover:bg-synth-primary/10
-            hover:shadow-[0_0_15px_rgba(255,0,255,0.3)]"
+            hover:shadow-[0_0_15px_rgba(255,0,255,0.3)]
+            active:opacity-80
+            active:scale-95
+            active:shadow-[0_0_10px_rgba(255,0,255,0.2)]
+            active:bg-synth-primary/20"
         >
           + New Category
         </button>
