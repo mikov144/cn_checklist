@@ -195,13 +195,13 @@ function Profile() {
                       file:transition-all
                       file:duration-300
                       file:ease-out
-                      hover:file:text-white
+                      hover:file:text-pink-500
                       hover:file:border-synth-secondary
                       hover:file:bg-synth-primary/20
                       hover:file:shadow-[0_0_15px_rgba(139,92,246,0.6)]
                       active:file:bg-synth-primary/30
                       active:file:border-synth-secondary
-                      active:file:text-white
+                      active:file:text-pink-700
                       active:file:shadow-[0_0_20px_rgba(139,92,246,0.8)]
                       focus:outline-none"
                   />

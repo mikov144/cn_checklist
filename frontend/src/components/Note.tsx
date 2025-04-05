@@ -38,9 +38,13 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, dragHandlePro
           type="checkbox"
           checked={note.scratched_out}
           onChange={() => onToggleScratchOut(note.id, !note.scratched_out)}
-          className="w-5 h-5 rounded border-synth-primary text-synth-primary focus:ring-synth-secondary
-            cursor-pointer transition-all duration-200
-            hover:border-pink-500 hover:ring-2 hover:ring-pink-500/30"
+          className="w-5 h-5 rounded border-synth-primary bg-synth-background
+            cursor-pointer transition-all
+            hover:border-pink-500 hover:ring-2 hover:ring-pink-500/30
+            focus:ring-pink-500/30 focus:ring-2 focus:ring-offset-0
+            checked:border-pink-500 
+            [&:checked]:bg-pink-500 [&:checked]:hover:bg-pink-600
+            accent-pink-500"
         />
 
         {/* Content */}
