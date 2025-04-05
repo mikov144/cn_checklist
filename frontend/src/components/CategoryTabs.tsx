@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Category } from '../context/CategoriesContext';
 import Modal from './Modal';
+import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 interface CategoryTabsProps {
   categories: Category[];
@@ -64,44 +65,55 @@ export default function CategoryTabs({
   };
 
   return (
-    <div className="mb-8">
+    <div>
       <div className="flex items-center space-x-4 overflow-x-auto pb-2">
         {categories.map((category) => (
-          <div key={category.id} className="flex items-center">
-            <button
-              onClick={() => onSelectCategory(category)}
-              className={`px-4 py-2 rounded-t-lg font-retro transition-all duration-200
-                ${selectedCategory?.id === category.id
-                  ? 'bg-synth-primary text-synth-background shadow-[0_0_10px_rgba(255,0,255,0.5)] border-b-2 border-pink-500'
-                  : 'text-synth-primary hover:text-pink-500 hover:bg-synth-primary/10'
-                }`}
-            >
-              {category.title}
-            </button>
-            <div className="flex space-x-1 ml-1">
+          <button
+            key={category.id}
+            onClick={() => onSelectCategory(category)}
+            className={`px-4 py-2 rounded-t-lg font-retro transition-all duration-200 bg-synth-primary text-synth-background shadow-[0_0_10px_rgba(150,150,150,0.5)] border-b-2 border-grey-500 flex items-center justify-between min-w-[120px]
+              ${selectedCategory?.id === category.id
+                ? 'bg-synth-primary text-synth-background shadow-[0_0_10px_rgba(255,0,255,0.5)] border-b-2 border-pink-500'
+                : 'bg-gray-600/40 text-gray-300 shadow-[0_0_10px_rgba(100,100,100,0.3)] border-gray-500 hover:bg-gray-500/70 hover:text-white hover:shadow-[0_0_10px_rgba(150,150,150,0.4)]'
+              }`}
+          >
+            <span>{category.title}</span>
+            <div className="flex space-x-1 ml-3">
               <button
-                onClick={() => openEditModal(category)}
-                className="p-1 text-synth-secondary hover:text-pink-500 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openEditModal(category);
+                }}
+                className={`p-1 transition-colors ${
+                  selectedCategory?.id === category.id
+                    ? 'text-synth-secondary hover:text-pink-500'
+                    : 'text-gray-400 hover:text-gray-200'
+                }`}
               >
-                ✎
+                <PencilSquareIcon className="w-5 h-5" />
               </button>
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   setCategoryToDelete(category);
                   setIsDeleteModalOpen(true);
                 }}
-                className="p-1 text-red-500 hover:text-red-400 transition-colors"
+                className={`p-1 transition-colors ${
+                  selectedCategory?.id === category.id
+                    ? 'text-red-500 hover:text-red-400'
+                    : 'text-red-400/50 hover:text-red-400'
+                }`}
               >
-                ×
+                <TrashIcon className="w-5 h-5" />
               </button>
             </div>
-          </div>
+          </button>
         ))}
         <button
           onClick={() => setIsCreateModalOpen(true)}
           className="px-4 py-2 rounded-lg border-2 border-synth-primary text-synth-primary
             transition-all duration-200 font-retro
-            hover:text-pink-500 hover:border-pink-500
+            hover:text-[#33f06b] hover:border-[#33f06b]
             hover:bg-synth-primary/10
             hover:shadow-[0_0_15px_rgba(255,0,255,0.3)]"
         >

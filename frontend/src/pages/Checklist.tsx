@@ -221,7 +221,7 @@ function Checklist() {
     <div className="min-h-screen bg-synth-background bg-cover bg-center flex flex-col p-2" style={{ backgroundImage: "url('/images/_main-background.webp')"}}>
       <Header />
       <div className="flex-grow p-6">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-end items-center mb-8">
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="button-retro px-6 py-2 rounded font-retro flex items-center text-lg"
@@ -272,7 +272,7 @@ function Checklist() {
                 {provided.placeholder}
                 {selectedCategory && filteredNotes.length === 0 && (
                   <p className="text-synth-secondary text-center py-8">
-                    No notes in this category yet. Create one to get started!
+                    No notes in this category yet...
                   </p>
                 )}
                 {!selectedCategory && (
