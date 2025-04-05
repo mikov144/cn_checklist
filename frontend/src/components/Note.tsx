@@ -23,22 +23,23 @@ interface NoteComponentProps {
 
 function Note({ note, index, onDelete, onEdit, onToggleScratchOut, dragHandleProps }: NoteComponentProps) {
   return (
-    <div className="flex items-center justify-between py-3 px-4 border-b border-synth-primary/30 group hover:bg-synth-primary/5 transition-colors">
-      <div className="flex items-center gap-4 flex-grow">
-        {/* Drag handle - only this part gets dragHandleProps */}
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 px-4 border-b border-synth-primary/30 group hover:bg-synth-primary/5 transition-colors">
+      {/* Top row with controls - always visible */}
+      <div className="flex items-center gap-4 mb-2 sm:mb-0">
+        {/* Drag handle - larger on mobile */}
         <div {...dragHandleProps} className="cursor-grab active:cursor-grabbing opacity-50 group-hover:opacity-100 transition-opacity">
-          <Bars2Icon className="h-5 w-5 text-synth-primary" />
+          <Bars2Icon className="h-6 w-6 sm:h-5 sm:w-5 text-synth-primary" />
         </div>
 
-        {/* Sequential Index instead of Note ID */}
-        <span className="text-synth-secondary font-mono min-w-[3ch]">#{index + 1}</span>
+        {/* Sequential Index */}
+        <span className="text-synth-secondary font-mono min-w-[3ch]">{index + 1})</span>
 
-        {/* Checkbox */}
+        {/* Checkbox - consistent size */}
         <input
           type="checkbox"
           checked={note.scratched_out}
           onChange={() => onToggleScratchOut(note.id, !note.scratched_out)}
-          className="w-5 h-5 rounded border-synth-primary bg-synth-background
+          className="w-6 h-6 sm:w-5 sm:h-5 sm:mr-5 rounded border-synth-primary bg-synth-background
             cursor-pointer transition-all
             hover:border-pink-500 hover:ring-2 hover:ring-pink-500/30
             focus:ring-pink-500/30 focus:ring-2 focus:ring-offset-0
@@ -47,31 +48,53 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, dragHandlePro
             accent-pink-500"
         />
 
-        {/* Content */}
+        {/* Action buttons - shown next to content on desktop, below controls on mobile */}
+        <div className="flex space-x-2 sm:hidden">
+          <button
+            onClick={() => onEdit(note)}
+            className="p-1.5 text-synth-primary hover:text-pink-500 transition-colors
+              active:opacity-70 active:scale-95 active:text-pink-600"
+            title="Edit note"
+          >
+            <PencilSquareIcon className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => onDelete(note.id)}
+            className="p-1.5 text-red-500 hover:text-red-400 transition-colors
+              active:opacity-70 active:scale-95 active:text-red-600"
+            title="Delete note"
+          >
+            <TrashIcon className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Content and desktop action buttons */}
+      <div className="flex items-center gap-4 flex-grow">
         <p className={`text-lg font-retro text-synth-text whitespace-pre-wrap flex-grow
           ${note.scratched_out ? 'line-through text-gray-400' : ''}`}>
           {note.content}
         </p>
-      </div>
 
-      {/* Action buttons */}
-      <div className="flex space-x-2">
-        <button
-          onClick={() => onEdit(note)}
-          className="p-2 text-synth-primary hover:text-pink-500 transition-colors
-            active:opacity-70 active:scale-95 active:text-pink-600"
-          title="Edit note"
-        >
-          <PencilSquareIcon className="h-5 w-5" />
-        </button>
-        <button
-          onClick={() => onDelete(note.id)}
-          className="p-2 text-red-500 hover:text-red-400 transition-colors
-            active:opacity-70 active:scale-95 active:text-red-600"
-          title="Delete note"
-        >
-          <TrashIcon className="h-5 w-5" />
-        </button>
+        {/* Action buttons - desktop only */}
+        <div className="hidden sm:flex space-x-2">
+          <button
+            onClick={() => onEdit(note)}
+            className="p-2 text-synth-primary hover:text-pink-500 transition-colors
+              active:opacity-70 active:scale-95 active:text-pink-600"
+            title="Edit note"
+          >
+            <PencilSquareIcon className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => onDelete(note.id)}
+            className="p-2 text-red-500 hover:text-red-400 transition-colors
+              active:opacity-70 active:scale-95 active:text-red-600"
+            title="Delete note"
+          >
+            <TrashIcon className="h-5 w-5" />
+          </button>
+        </div>
       </div>
     </div>
   );
