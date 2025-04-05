@@ -12,10 +12,10 @@ function Home() {
         <section className="max-w-4xl w-full bg-gray-900/90 rounded-lg p-8 backdrop-blur-sm shadow-lg border border-gray-800">
           <div className="flex flex-col items-center mb-8">
             <img src="/images/_about-boop.gif" alt="milk boops" className="w-auto h-37 mb-4" />
-            <h1 className="text-5xl font-retro neon-text text-synth-primary mb-6 text-center">
+            <h1 className="font-retro neon-text text-synth-primary mb-6 text-center text-4xl sm:text-5xl">
               Welcome to the milk's corner! My name is milk!
             </h1>
-            <img src="/images/_about-milkstand.png" alt="milk stands" className="w-auto h-37 mb-4" />
+            <img src="/images/_about-milkstand.png" alt="milk stands" className="max-w-full sm:w-auto sm:h-37 mb-4" />
           </div>
 
           <div className="space-y-4 text-synth-secondary neon-text text-2xl">
