@@ -1,97 +1,70 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../api";
-import Note, { NoteProps } from "../components/Note";
+// src/pages/Home.tsx
+
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import { Link } from "react-router-dom";
 
 function Home() {
-  const [notes, setNotes] = useState<NoteProps[]>([]);
-  const [content, setContent] = useState("");
-  const [title, setTitle] = useState("");
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    getNotes();
-  }, []);
-
-  const getNotes = () => {
-    api
-      .get("/api/notes/")
-      .then((res) => res.data)
-      .then((data) => {
-        setNotes(data);
-        console.log(data);
-      })
-      .catch((err) => alert(err));
-  };
-
-  const deleteNote = (id: number) => {
-    api
-      .delete(`/api/notes/delete/${id}/`)
-      .then((res) => {
-        if (res.status === 204) console.log("Note deleted!");
-        else alert("Failed to delete note.");
-        getNotes();
-      })
-      .catch((error) => alert(error));
-  };
-
-  const createNote = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    api
-      .post("/api/notes/", { content, title })
-      .then((res) => {
-        if (res.status === 201) console.log("Note created!");
-        else alert("Failed to make note.");
-        getNotes();
-      })
-      .catch((err) => alert(err));
-  };
-
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
-
   return (
-    <div className="font-sans min-h-screen bg-gray-100 relative">
-      <button 
-        onClick={handleLogout} 
-        className="absolute top-4 right-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-      >
-        Logout
-      </button>
-      <div className="notes-section mb-8">
-        <h2 className="text-gray-800 text-2xl">Notes</h2>
-        {notes.map((note) => (
-          <Note note={note} onDelete={deleteNote} key={note.id} />
-        ))}
+    <div className="min-h-screen bg-synth-background bg-cover bg-center flex flex-col p-2" style={{ backgroundImage: "url('/images/_main-background.webp')"}}>
+      <Header />
+      <div className="flex-grow flex flex-col items-center p-6">
+        <section className="max-w-4xl w-full bg-gray-900/90 rounded-lg p-8 backdrop-blur-sm shadow-lg border border-gray-800">
+          <div className="flex flex-col items-center mb-8">
+            <img src="/images/_about-boop.gif" alt="milk boops" className="w-auto h-37 mb-4" />
+            <h1 className="font-retro neon-text text-synth-primary mb-6 text-center text-4xl sm:text-5xl">
+              Welcome to the milk's corner! My name is milk!
+            </h1>
+            <img src="/images/_about-milkstand.png" alt="milk stands" className="max-w-full sm:w-auto sm:h-37 mb-4" />
+          </div>
+
+          <div className="space-y-4 text-synth-secondary neon-text text-2xl">
+            <p>
+              I like anime and videogames and my favorite band is Nickelback!
+            </p>
+            <p>
+              Be sure to <Link to="/login" className="text-synth-primary link-hover inline-block highlight-text cursor-pointer">register or log in</Link> to use all of the website's features! Current avaiable functionality:
+            </p>
+            <ul>
+              <li>
+                <Link to="/checklist" className="text-synth-primary link-hover inline-block highlight-text cursor-pointer">
+                  Checklist
+                </Link>
+              </li>
+            </ul>
+            <h2 className="text-3xl font-retro text-synth-primary mt-8 mb-4">
+              Contact me:
+            </h2>
+
+            <div className="space-y-3">
+              <p>
+                You can find my YouTube channel here:{' '}
+                <a 
+                  href="https://www.youtube.com/channel/UCY2uiqwdT4ET_6hCgg_VgQw" 
+                  className="text-synth-primary link-hover inline-block highlight-text"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  link to my channel
+                </a>
+              </p>
+              <p>
+                XMPP:{' '}
+                <span className="text-synth-primary highlight-text">milk@macaw.me</span>
+              </p>
+              <p>
+                Telegram:{' '}
+                <span className="text-synth-primary highlight-text">@mikov144</span>
+              </p>
+              <p>
+                Discord:{' '}
+                <span className="text-synth-primary highlight-text">mikov144</span>
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
-      <h2 className="text-gray-800 text-2xl mb-5">Create a Note</h2>
-      <form onSubmit={createNote} className="bg-white p-5 rounded-lg shadow max-w-md mx-auto">
-        <label htmlFor="title" className="font-bold mt-2">Title:</label>
-        <br />
-        <input
-          type="text"
-          id="title"
-          name="title"
-          required
-          onChange={(e) => setTitle(e.target.value)}
-          value={title}
-          className="w-full p-2 my-2 border border-gray-300 rounded"
-        />
-        <label htmlFor="content" className="font-bold mt-2">Content:</label>
-        <br />
-        <textarea
-          id="content"
-          name="content"
-          required
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="w-full p-2 my-2 border border-gray-300 rounded"
-        ></textarea>
-        <br />
-        <input type="submit" value="Submit" className="bg-blue-500 text-white p-2 rounded cursor-pointer hover:bg-blue-700" />
-      </form>
+      <Footer />
     </div>
   );
 }

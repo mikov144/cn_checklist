@@ -1,3 +1,5 @@
+// src/components/ProtectedRoute.tsx
+
 import { Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import api from "../api";
@@ -16,7 +18,7 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   const refreshToken = async () => {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN);
     try {
-      const res = await api.post("/api/v1/refresh/", {
+      const res = await api.post("/api/token/refresh/", {
         refresh: refreshToken,
       });
       if (res.status === 200) {

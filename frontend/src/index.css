@@ -1,1 +1,79 @@
+/* index.css */
+
 @import "tailwindcss";
+
+body {
+  background-color: #1A1A2E;
+  color: #FFFFFF;
+  font-family: 'Teko', sans-serif;
+}
+
+/* Neon glow effect */
+.neon-text {
+  text-shadow: 0 0 5px #FF00FF, 0 0 10px #FF00FF, 0 0 20px #FF00FF;
+}
+
+.neon-border {
+  border: 2px solid #FF007F;
+  box-shadow: 0 0 5px #FF007F, 0 0 10px #FF007F, 0 0 20px #FF007F;
+}
+
+/* Retro button styles */
+.button-retro {
+  background: #FF007F;
+  color: #FFFFFF;
+  border: 2px solid #00FFFF;
+  box-shadow: 0 0 5px #00FFFF, 0 0 10px #00FFFF;
+  transition: all 0.3s ease;
+  transform: translateY(0);
+}
+
+.button-retro:hover {
+  box-shadow: 0 0 10px #FF007F, 0 0 20px #FF007F;
+  transform: translateY(-2px);
+}
+
+.button-retro:active {
+  transform: translateY(0);
+  background: #cc0066;  /* Darker shade when clicked */
+  box-shadow: 0 0 5px #FF007F, 0 0 10px #FF007F inset;  /* Inner glow effect when clicked */
+  border-color: #00cccc;  /* Slightly darker border when clicked */
+}
+
+/* Interactive link styles */
+.link-hover {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.link-hover:hover {
+  color: #1fe75b;
+  text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF, 0 0 30px #FF00FF;
+  transform: translateY(-2px);
+}
+
+.link-hover:active {
+  transform: translateY(0);
+}
+
+/* Optional: add an underline animation */
+.link-hover::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background: #33f06b;
+  box-shadow: 0 0 5px #FF00FF, 0 0 10px #FF00FF;
+  transition: width 0.3s ease;
+}
+
+.link-hover:hover::after {
+  width: 100%;
+}
+
+.highlight-text {
+  color: #33f06b;
+  text-shadow: 0 0 10px #33f06b, 0 0 0 #33f06b, 0 0 1px #33f06b;
+}
