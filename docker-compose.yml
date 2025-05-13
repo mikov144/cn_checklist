@@ -9,15 +9,27 @@ services:
     environment:
       - POSTGRES_DB=checklist
       - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=1234
+      - POSTGRES_PASSWORD=Pushkin@144
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    command: gunicorn --bind 0.0.0.0:8000 cl_back.wsgi:application
+    command: >
+      sh -c "while ! nc -z db 5432; do
+               echo 'Waiting for database...';
+               sleep 1;
+             done;
+             python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8000 cl_back.wsgi:application"
     volumes:
       - static_volume:/app/static
       - media_volume:/app/media
@@ -30,10 +42,9 @@ services:
       - PASSWORD=Pushkin@144
       - HOST=db
       - PORT=5432
-    ports:
-      - "8000:8000"  # Add this to expose backend API
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - app_network
 
@@ -42,7 +53,11 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "80:80"  # Changed from 3000:80 to 80:80 for production
+      - "80:80"
+      - "443:443"  # Add HTTPS port
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - media_volume:/var/www/media
     depends_on:
       - backend
     networks:
