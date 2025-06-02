@@ -4,6 +4,7 @@ version: '3.8'
 services:
   db:
     image: postgres:15
+    restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -13,7 +14,7 @@ services:
     networks:
       - app_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin"]
+      test: ["CMD-SHELL", "pg_isready -U admin -h localhost"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -22,6 +23,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    restart: unless-stopped
     command: >
       sh -c "while ! nc -z db 5432; do
                echo 'Waiting for database...';
@@ -52,6 +54,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"  # Add HTTPS port
