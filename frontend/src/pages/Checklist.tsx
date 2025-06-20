@@ -99,7 +99,7 @@ function Checklist() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [noteToDelete, setNoteToDelete] = useState<number | null>(null);
+  const [noteToDelete, setNoteToDelete] = useState<NoteProps | null>(null);
   const [noteToEdit, setNoteToEdit] = useState<NoteProps | null>(null);
   const [createFormData, setCreateFormData] = useState<FormData>({ content: "" });
   const [editFormData, setEditFormData] = useState<FormData>({ content: "" });
@@ -112,8 +112,8 @@ function Checklist() {
     initialize();
   }, []); // Remove refreshNotes and refreshCategories from dependencies to prevent re-runs
 
-  const handleDeleteClick = useCallback((id: number) => {
-    setNoteToDelete(id);
+  const handleDeleteClick = useCallback((note: NoteProps) => {
+    setNoteToDelete(note);
     setIsDeleteModalOpen(true);
   }, []);
 
@@ -126,7 +126,7 @@ function Checklist() {
   const handleDeleteConfirm = async () => {
     if (noteToDelete === null) return;
     try {
-      await deleteNoteApi(noteToDelete);
+      await deleteNoteApi(noteToDelete.id);
       setIsDeleteModalOpen(false);
       setNoteToDelete(null);
     } catch (error) {
@@ -221,7 +221,24 @@ function Checklist() {
     <div className="min-h-screen bg-synth-background bg-cover bg-center flex flex-col p-2" style={{ backgroundImage: "url('/images/_main-background.webp')"}}>
       <Header />
       <div className="flex-grow p-6">
-        <div className="flex justify-end items-center mb-8">
+        <div className="flex justify-end items-center mb-8 space-x-4">
+          <button
+            onClick={async () => {
+              if (!selectedCategory) {
+                alert("Please select a category first");
+                return;
+              }
+              try {
+                await createNoteApi("---------------------------------------------------------------------------------------------------------------", selectedCategory.id);
+              } catch (error) {
+                alert("Failed to create line: " + error);
+              }
+            }}
+            className="button-retro px-6 py-2 rounded font-retro flex items-center text-lg"
+            disabled={!selectedCategory}
+          >
+            Add Line
+          </button>
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="button-retro px-6 py-2 rounded font-retro flex items-center text-lg"
@@ -260,7 +277,7 @@ function Checklist() {
                         <Note 
                           note={note} 
                           index={index}
-                          onDelete={handleDeleteClick}
+                          onDelete={() => handleDeleteClick(note)}
                           onEdit={() => handleEditClick(note)}
                           onToggleScratchOut={toggleNoteScratchOut}
                           dragHandleProps={provided.dragHandleProps}
@@ -293,7 +310,7 @@ function Checklist() {
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteConfirm}
         title="Delete Note"
-        message="Are you sure you want to delete this note?"
+        message={`Are you sure you want to delete this note?\n\n"${noteToDelete?.content || ''}"`}
       />
 
       <Modal

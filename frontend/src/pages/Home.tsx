@@ -23,7 +23,7 @@ function Home() {
               I like anime and videogames and my favorite band is Nickelback!
             </p>
             <p>
-              Be sure to <Link to="/login" className="text-synth-primary link-hover inline-block highlight-text cursor-pointer">register or log in</Link> to use all of the website's features! Current avaiable functionality:
+              Be sure to <Link to="/login" className="text-synth-primary link-hover inline-block highlight-text cursor-pointer">register or log in</Link> to use all of the website's features! Current available functionality:
             </p>
             <ul>
               <li>
