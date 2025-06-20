@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -19,25 +19,7 @@ const Modal: React.FC<ModalProps> = ({
   children,
   showActions = true
 }) => {
-  // Handle Enter key press
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && isOpen && onConfirm) {
-        event.preventDefault();
-        onConfirm();
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onConfirm, onClose]);
-
+  
   if (!isOpen) return null;
 
   return (
@@ -51,7 +33,7 @@ const Modal: React.FC<ModalProps> = ({
       {/* Modal */}
       <div className="bg-synth-background p-6 rounded-lg neon-border z-10 bg-gray-900/95 max-w-md w-full mx-4 transform transition-all duration-200 scale-100">
         <h2 className="text-2xl font-retro text-synth-primary neon-text mb-4">{title}</h2>
-        {message && <p className="text-synth-text mb-6">{message}</p>}
+        {message && <p className="text-synth-text mb-6 whitespace-pre-line">{message}</p>}
         {children}
         
         {showActions && (

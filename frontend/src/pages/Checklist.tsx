@@ -112,10 +112,21 @@ function Checklist() {
     initialize();
   }, []); // Remove refreshNotes and refreshCategories from dependencies to prevent re-runs
 
-  const handleDeleteClick = useCallback((note: NoteProps) => {
+  const handleDeleteClick = useCallback(async (note: NoteProps) => {
+    // If it's a line separator, delete directly without confirmation
+    if (note.content === "---------------------------------------------------------------------------------------------------------------") {
+      try {
+        await deleteNoteApi(note.id);
+      } catch (error) {
+        alert("Failed to delete line: " + error);
+      }
+      return;
+    }
+    
+    // For regular notes, show confirmation modal
     setNoteToDelete(note);
     setIsDeleteModalOpen(true);
-  }, []);
+  }, [deleteNoteApi]);
 
   const handleEditClick = useCallback((note: NoteProps) => {
     setNoteToEdit(note);
