@@ -169,10 +169,24 @@ class PresenceStats(APIView):
     def get(self, request, *args, **kwargs):
         now = timezone.now()
         threshold = now - timedelta(seconds=self.ONLINE_WINDOW_SECONDS)
-        online_count = VisitorPresence.objects.filter(last_seen__gte=threshold).count()
+        recent_qs = VisitorPresence.objects.filter(last_seen__gte=threshold)
+        online_authenticated_users = recent_qs.exclude(user__isnull=True).values_list('user', flat=True).distinct().count()
+        online_anonymous_visitors = recent_qs.filter(user__isnull=True).count()
+        online_count = online_authenticated_users + online_anonymous_visitors
+
         total_visitors = VisitorPresence.objects.count()
+        total_users_ever = VisitorPresence.objects.exclude(user__isnull=True).values_list('user', flat=True).distinct().count()
+
         return Response({
             'online': online_count,
             'total': total_visitors,
+            'online_breakdown': {
+                'authenticated_users': online_authenticated_users,
+                'anonymous_visitors': online_anonymous_visitors,
+            },
+            'totals': {
+                'unique_visitors': total_visitors,
+                'unique_authenticated_users': total_users_ever,
+            },
             'window_seconds': self.ONLINE_WINDOW_SECONDS,
         })
