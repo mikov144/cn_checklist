@@ -5,11 +5,15 @@ import { useEffect, useState } from "react";
 import { ACCESS_TOKEN } from "../constants";
 import { useUser } from "../context/UserContext";
 import Modal from "./Modal";
+import api from "../api";
 
 function Header() {
   const navigate = useNavigate();
   const { user, loading, refreshUserData } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [presence, setPresence] = useState<{ online: number; total: number } | null>(null);
+  const HEARTBEAT_INTERVAL_MS = 30000; // 30s
+  const ONLINE_WINDOW_FALLBACK_MS = 60000; // should match backend
 
   useEffect(() => {
     const initializeUser = async () => {
@@ -20,6 +24,48 @@ function Header() {
     };
 
     initializeUser();
+  }, []);
+
+  useEffect(() => {
+    const getOrCreateVisitorId = () => {
+      const key = "visitor_id";
+      let id = localStorage.getItem(key);
+      if (!id) {
+        id = crypto.randomUUID();
+        localStorage.setItem(key, id);
+      }
+      return id;
+    };
+
+    const sendHeartbeat = async () => {
+      try {
+        const visitor_id = getOrCreateVisitorId();
+        await api.post('/api/presence/heartbeat/', { visitor_id });
+      } catch (e) {
+        // silent fail
+      }
+    };
+
+    const fetchStats = async () => {
+      try {
+        const { data } = await api.get('/api/presence/stats/');
+        setPresence({ online: data.online, total: data.total });
+      } catch (e) {
+        // silent fail
+      }
+    };
+
+    // initial kick
+    sendHeartbeat();
+    fetchStats();
+
+    const heartbeatTimer = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL_MS);
+    const statsTimer = setInterval(fetchStats, Math.min(HEARTBEAT_INTERVAL_MS, ONLINE_WINDOW_FALLBACK_MS));
+
+    return () => {
+      clearInterval(heartbeatTimer);
+      clearInterval(statsTimer);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -40,6 +86,19 @@ function Header() {
       title=""
       showActions={false}
     >
+      <div className="flex justify-center mb-6">
+        <div className="text-synth-secondary neon-text text-xl">
+          {presence ? (
+            <span>
+              Online: <span className="text-synth-primary">{presence.online}</span>
+              <span className="mx-2 text-gray-500">|</span>
+              Total: <span className="text-synth-primary">{presence.total}</span>
+            </span>
+          ) : (
+            <span>...</span>
+          )}
+        </div>
+      </div>
       {!loading && (
         <>
           {user ? (
@@ -136,7 +195,18 @@ function Header() {
       </nav>
 
       {/* User profile and auth button - visible only on desktop */}
-      <div className="hidden md:flex items-center space-x-4">
+      <div className="hidden md:flex items-center space-x-6">
+        <div className="text-synth-secondary neon-text text-xl">
+          {presence ? (
+            <span>
+              Online: <span className="text-synth-primary">{presence.online}</span>
+              <span className="mx-2 text-gray-500">|</span>
+              Total: <span className="text-synth-primary">{presence.total}</span>
+            </span>
+          ) : (
+            <span>...</span>
+          )}
+        </div>
         {!loading && (
           <>
             {user ? (
