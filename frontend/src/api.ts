@@ -3,7 +3,7 @@
 import axios from "axios";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "./constants";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const BASE_URL = import.meta.env.VITE_API_URL || "https://milkspace.ru";
 
 // Create a separate instance for refresh token requests
 const refreshApi = axios.create({
