@@ -92,7 +92,7 @@ function Header() {
             <span>
               Online: <span className="text-synth-primary">{presence.online}</span>
               <span className="mx-2 text-gray-500">|</span>
-              Total: <span className="text-synth-primary">{presence.total}</span>
+              Visited: <span className="text-synth-primary">{presence.total}</span>
             </span>
           ) : (
             <span>...</span>
@@ -201,7 +201,7 @@ function Header() {
             <span>
               Online: <span className="text-synth-primary">{presence.online}</span>
               <span className="mx-2 text-gray-500">|</span>
-              Total: <span className="text-synth-primary">{presence.total}</span>
+              Visited: <span className="text-synth-primary">{presence.total}</span>
             </span>
           ) : (
             <span>...</span>

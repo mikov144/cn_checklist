@@ -328,7 +328,7 @@ function Form() {
         <p className="text-center mt-4 text-synth-secondary neon-text text-lg">
           {method === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
           <span
-            className="text-synth-primary link-hover inline-block cursor-pointer"
+            className="text-synth-primary link-hover inline-block cursor-pointer font-semibold decoration-synth-primary decoration-2 underline-offset-4 px-1 py-0.5 rounded hover:bg-synth-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-synth-secondary transition duration-150"
             onClick={toggleMethod}
           >
             {method === "login" ? "Register here" : "Login here"}
