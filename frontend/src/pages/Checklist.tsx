@@ -83,6 +83,7 @@ function Checklist() {
     updateNote: updateNoteApi, 
     deleteNote: deleteNoteApi,
     toggleNoteScratchOut,
+    toggleNoteImportant,
     reorderNotes
   } = useNotes();
   const { 
@@ -291,6 +292,7 @@ function Checklist() {
                           onDelete={() => handleDeleteClick(note)}
                           onEdit={() => handleEditClick(note)}
                           onToggleScratchOut={toggleNoteScratchOut}
+                          onToggleImportant={toggleNoteImportant}
                           dragHandleProps={provided.dragHandleProps}
                         />
                       </div>
