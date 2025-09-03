@@ -252,7 +252,7 @@ export default function CategoryTabs({
         }}
         onConfirm={handleDeleteConfirm}
         title="Delete Category"
-        message={`Are you sure you want to delete the category "${categoryToDelete?.title}"?`}
+        message={`Are you sure you want to delete this category?\n\n"${categoryToDelete?.title}"`}
       />
     </div>
   );
