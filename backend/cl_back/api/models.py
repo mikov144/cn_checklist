@@ -17,6 +17,7 @@ class Note(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="notes")
     order = models.PositiveIntegerField(default=0)
     scratched_out = models.BooleanField(default=False)
+    important = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.order == 0:
