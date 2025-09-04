@@ -310,7 +310,7 @@ function Form() {
                 <button
                   type="button"
                   onClick={clearProfilePicture}
-                  className="button-retro py-2.5 px-4 text-sm h-[42px] flex items-center justify-center min-w-[100px]"
+                  className="button-retro py-2.5 px-4 text-sm h-[42px] flex items-center justify-center min-w-[100px] cursor-pointer"
                 >
                   Clear Image
                 </button>
@@ -320,7 +320,7 @@ function Form() {
         )}
         {loading && <LoadingIndicator />}
         <button
-          className="button-retro w-full py-3 rounded text-xl"
+          className="button-retro w-full py-3 rounded text-xl cursor-pointer"
           type="submit"
         >
           {name}

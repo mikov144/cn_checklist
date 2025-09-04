@@ -42,7 +42,7 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImpor
           className={`p-1.5 rounded transition-colors active:opacity-80 active:scale-95 ${note.important ? 'text-yellow-400' : 'text-synth-secondary hover:text-yellow-300'}`}
           title={note.important ? 'Unmark important' : 'Mark as important'}
         >
-          <ExclamationTriangleIcon className="h-6 w-6 sm:h-5 sm:w-5" />
+          <ExclamationTriangleIcon className="h-6 w-6 sm:h-5 sm:w-5 cursor-pointer" />
         </button>
 
         {/* Checkbox - consistent size */}
@@ -67,7 +67,7 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImpor
               active:opacity-70 active:scale-95 active:text-pink-600"
             title="Edit note"
           >
-            <PencilSquareIcon className="h-5 w-5" />
+            <PencilSquareIcon className="h-5 w-5 cursor-pointer" />
           </button>
           <button
             onClick={() => onDelete(note.id)}
@@ -75,7 +75,7 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImpor
               active:opacity-70 active:scale-95 active:text-red-600"
             title="Delete note"
           >
-            <TrashIcon className="h-5 w-5" />
+            <TrashIcon className="h-5 w-5 cursor-pointer" />
           </button>
         </div>
       </div>
@@ -95,7 +95,7 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImpor
               active:opacity-70 active:scale-95 active:text-pink-600"
             title="Edit note"
           >
-            <PencilSquareIcon className="h-5 w-5" />
+            <PencilSquareIcon className="h-5 w-5 cursor-pointer" />
           </button>
           <button
             onClick={() => onDelete(note.id)}
@@ -103,7 +103,7 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImpor
               active:opacity-70 active:scale-95 active:text-red-600"
             title="Delete note"
           >
-            <TrashIcon className="h-5 w-5" />
+            <TrashIcon className="h-5 w-5 cursor-pointer" />
           </button>
         </div>
       </div>

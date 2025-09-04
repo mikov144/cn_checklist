@@ -51,7 +51,7 @@ const NoteForm = ({
         type="button"
         onClick={onCancel}
         className="px-4 py-2 rounded border-2 border-synth-primary text-synth-primary
-          transition-all duration-200 font-retro
+          transition-all duration-200 font-retro cursor-pointer
           hover:text-pink-500 hover:border-pink-500
           hover:bg-synth-primary/10 
           hover:shadow-[0_0_15px_rgba(255,0,255,0.3)]
@@ -66,7 +66,7 @@ const NoteForm = ({
       </button>
       <button
         type="submit"
-        className="button-retro px-4 py-2 rounded font-retro"
+        className="button-retro px-4 py-2 rounded font-retro cursor-pointer"
       >
         {submitText}
       </button>
@@ -246,14 +246,14 @@ function Checklist() {
                 alert("Failed to create line: " + error);
               }
             }}
-            className="button-retro px-6 py-2 rounded font-retro flex items-center text-lg"
+            className="button-retro px-6 py-2 rounded font-retro flex items-center text-lg cursor-pointer"
             disabled={!selectedCategory}
           >
             Add Line
           </button>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="button-retro px-6 py-2 rounded font-retro flex items-center text-lg"
+            className="button-retro px-6 py-2 rounded font-retro flex items-center text-lg cursor-pointer"
             disabled={!selectedCategory}
           >
             Create Note

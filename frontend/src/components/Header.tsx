@@ -230,7 +230,7 @@ function Header() {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="button-retro py-2 px-4 rounded text-lg"
+                  className="button-retro py-2 px-4 rounded text-lg cursor-pointer"
                 >
                   Logout
                 </button>
@@ -238,7 +238,7 @@ function Header() {
             ) : (
               <button
                 onClick={handleLogin}
-                className="button-retro py-2 px-4 rounded"
+                className="button-retro py-2 px-4 rounded cursor-pointer"
               >
                 Login
               </button>

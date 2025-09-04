@@ -167,7 +167,7 @@ function Profile() {
                 type="button"
                 onClick={handlePasswordChange}
                 disabled={!oldPassword || !newPassword}
-                className="button-retro w-full py-2 rounded text-lg disabled:opacity-50"
+                className="button-retro w-full py-2 rounded text-lg disabled:opacity-50 cursor-pointer"
               >
                 Update Password
               </button>
@@ -210,7 +210,7 @@ function Profile() {
                   <button
                     type="button"
                     onClick={clearProfilePicture}
-                    className="button-retro py-2.5 px-4 text-sm h-[42px] flex items-center justify-center min-w-[100px]"
+                    className="button-retro py-2.5 px-4 text-sm h-[42px] flex items-center justify-center min-w-[100px] cursor-pointer"
                   >
                     Clear Image
                   </button>
@@ -221,7 +221,7 @@ function Profile() {
             <button
               type="submit"
               disabled={updating}
-              className="button-retro w-full py-3 rounded disabled:opacity-50 text-xl"
+              className="button-retro w-full py-3 rounded disabled:opacity-50 text-xl cursor-pointer"
             >
               {updating ? "Updating..." : "Update Profile"}
             </button>

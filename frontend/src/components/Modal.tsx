@@ -41,7 +41,7 @@ const Modal: React.FC<ModalProps> = ({
             <button
               onClick={onClose}
               className="px-4 py-2 rounded border-2 border-synth-primary text-synth-primary
-                transition-all duration-200 font-retro
+                transition-all duration-200 font-retro cursor-pointer
                 hover:text-pink-500 hover:border-pink-500
                 hover:bg-synth-primary/10 
                 hover:shadow-[0_0_15px_rgba(255,0,255,0.3)]
@@ -59,7 +59,7 @@ const Modal: React.FC<ModalProps> = ({
                 if (onConfirm) onConfirm();
                 onClose();
               }}
-              className="button-retro px-4 py-2 rounded font-retro"
+              className="button-retro px-4 py-2 rounded font-retro cursor-pointer"
             >
               Yes
             </button>
