@@ -1,6 +1,6 @@
 // src/components/Note.tsx
 
-import { PencilSquareIcon, TrashIcon, Bars2Icon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon, TrashIcon, Bars2Icon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 export interface NoteProps {
   id: number;
@@ -10,6 +10,7 @@ export interface NoteProps {
   category: number;
   order: number;
   scratched_out: boolean;
+  important: boolean;
 }
 
 interface NoteComponentProps {
@@ -18,10 +19,11 @@ interface NoteComponentProps {
   onDelete: (id: number) => void;
   onEdit: (note: NoteProps) => void;
   onToggleScratchOut: (id: number, scratched_out: boolean) => void;
+  onToggleImportant: (id: number, important: boolean) => void;
   dragHandleProps?: any;
 }
 
-function Note({ note, index, onDelete, onEdit, onToggleScratchOut, dragHandleProps }: NoteComponentProps) {
+function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImportant, dragHandleProps }: NoteComponentProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 px-4 border-b border-synth-primary/30 group hover:bg-synth-primary/5 transition-colors">
       {/* Top row with controls - always visible */}
@@ -33,6 +35,15 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, dragHandlePro
 
         {/* Sequential Index */}
         <span className="text-synth-secondary font-mono min-w-[3ch]">{index + 1})</span>
+
+        {/* Important toggle */}
+        <button
+          onClick={() => onToggleImportant(note.id, !note.important)}
+          className={`p-1.5 rounded transition-colors active:opacity-80 active:scale-95 ${note.important ? 'text-yellow-400' : 'text-synth-secondary hover:text-yellow-300'}`}
+          title={note.important ? 'Unmark important' : 'Mark as important'}
+        >
+          <ExclamationTriangleIcon className="h-6 w-6 sm:h-5 sm:w-5" />
+        </button>
 
         {/* Checkbox - consistent size */}
         <input
@@ -72,7 +83,7 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, dragHandlePro
       {/* Content and desktop action buttons */}
       <div className="flex items-center gap-4 flex-grow">
         <p className={`text-lg font-retro text-synth-text whitespace-pre-wrap flex-grow
-          ${note.scratched_out ? 'line-through text-gray-400' : ''}`}>
+          ${note.scratched_out ? 'line-through text-gray-400' : ''} ${note.important ? 'highlight-text' : ''}`}>
           {note.content}
         </p>
 

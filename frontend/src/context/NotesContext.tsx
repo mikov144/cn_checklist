@@ -12,6 +12,7 @@ interface NotesContextType {
   createNote: (content: string, category: number) => Promise<void>;
   updateNote: (id: number, content: string) => Promise<void>;
   toggleNoteScratchOut: (id: number, scratched_out: boolean) => Promise<void>;
+  toggleNoteImportant: (id: number, important: boolean) => Promise<void>;
   deleteNote: (id: number) => Promise<void>;
   reorderNotes: (noteIds: number[]) => Promise<void>;
 }
@@ -94,6 +95,20 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     }
   }, [refreshNotes]);
 
+  const toggleNoteImportant = useCallback(async (id: number, important: boolean) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await api.patch(`/api/notes/update/${id}/`, { important });
+      await refreshNotes();
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [refreshNotes]);
+
   const deleteNote = useCallback(async (id: number) => {
     try {
       setLoading(true);
@@ -131,6 +146,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       createNote, 
       updateNote,
       toggleNoteScratchOut,
+      toggleNoteImportant,
       deleteNote,
       reorderNotes 
     }}>

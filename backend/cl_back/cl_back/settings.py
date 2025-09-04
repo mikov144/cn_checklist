@@ -15,13 +15,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = os.environ.get('DEBUG') == 'True'
+# Provide safe development defaults when env vars are missing
+SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-insecure-secret-key-change-me')
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [
     'milkspace.ru',
     'www.milkspace.ru',
     'localhost',  # Keep this for local development
+    '127.0.0.1',  # Localhost IP
     'backend',    # Add this for Docker internal communication
 ]
 
@@ -90,12 +92,13 @@ WSGI_APPLICATION = 'cl_back.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.environ.get('ENGINE'),
-        'NAME': os.environ.get('NAME'),
-        'USER': os.environ.get('USER'),
-        'PASSWORD': os.environ.get('PASSWORD'),
-        'HOST': os.environ.get('HOST'),
-        'PORT': os.environ.get('PORT'),
+        # Fall back to SQLite for local development when ENGINE is not provided
+        'ENGINE': os.environ.get('ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.environ.get('NAME', os.path.join(BASE_DIR, 'db.sqlite3')),
+        'USER': os.environ.get('USER', ''),
+        'PASSWORD': os.environ.get('PASSWORD', ''),
+        'HOST': os.environ.get('HOST', ''),
+        'PORT': os.environ.get('PORT', ''),
     }
 }
 
@@ -145,12 +148,32 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
     "https://milkspace.ru",
-    "https://www.milkspace.ru"
+    "https://www.milkspace.ru",
 ]
+
+# Allow Vite dev server during local development
+if DEBUG:
+    CORS_ALLOWED_ORIGINS += [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
+
+# CSRF trusted origins for cookie-based interactions (not strictly required for JWT, but safe to set)
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
+else:
+    CSRF_TRUSTED_ORIGINS = [
+        "https://milkspace.ru",
+        "https://www.milkspace.ru",
+    ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# Only enforce HTTPS and secure cookies in production
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG

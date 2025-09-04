@@ -3,7 +3,9 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import UserCreateSerializer, UserUpdateSerializer, NoteSerializer, ChangePasswordSerializer, CategorySerializer
-from .models import Note, Category
+from .models import Note, Category, VisitorPresence
+from django.utils import timezone
+from datetime import timedelta
 
 class NoteListCreate(generics.ListCreateAPIView):
     serializer_class = NoteSerializer
@@ -128,3 +130,63 @@ class ChangePasswordView(APIView):
             return Response({"detail": "Password updated successfully."}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PresenceHeartbeat(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        visitor_id = request.data.get('visitor_id')
+        user_agent = request.headers.get('User-Agent', '')[:255]
+        ip_address = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or request.META.get('REMOTE_ADDR')
+
+        if not visitor_id:
+            return Response({"error": "visitor_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        defaults = {
+            'user': request.user if request.user.is_authenticated else None,
+            'user_agent': user_agent,
+            'ip_address': ip_address,
+        }
+
+        visitor, created = VisitorPresence.objects.get_or_create(visitor_id=visitor_id, defaults=defaults)
+
+        # Update association if user logs in later
+        if request.user.is_authenticated and visitor.user != request.user:
+            visitor.user = request.user
+        visitor.user_agent = user_agent
+        visitor.ip_address = ip_address
+        visitor.touch()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PresenceStats(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    ONLINE_WINDOW_SECONDS = 60
+
+    def get(self, request, *args, **kwargs):
+        now = timezone.now()
+        threshold = now - timedelta(seconds=self.ONLINE_WINDOW_SECONDS)
+        recent_qs = VisitorPresence.objects.filter(last_seen__gte=threshold)
+        online_authenticated_users = recent_qs.exclude(user__isnull=True).values_list('user', flat=True).distinct().count()
+        online_anonymous_visitors = recent_qs.filter(user__isnull=True).count()
+        online_count = online_authenticated_users + online_anonymous_visitors
+
+        total_visitors = VisitorPresence.objects.count()
+        total_users_ever = VisitorPresence.objects.exclude(user__isnull=True).values_list('user', flat=True).distinct().count()
+
+        return Response({
+            'online': online_count,
+            'total': total_visitors,
+            'online_breakdown': {
+                'authenticated_users': online_authenticated_users,
+                'anonymous_visitors': online_anonymous_visitors,
+            },
+            'totals': {
+                'unique_visitors': total_visitors,
+                'unique_authenticated_users': total_users_ever,
+            },
+            'window_seconds': self.ONLINE_WINDOW_SECONDS,
+        })

@@ -80,9 +80,17 @@ export default function CategoryTabs({
     <div>
       <div className="flex items-center space-x-4 overflow-x-auto pb-2 scrollbar-none">
         {categories.map((category) => (
-          <button
+          <div
             key={category.id}
+            role="button"
+            tabIndex={0}
             onClick={() => onSelectCategory(category)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onSelectCategory(category);
+              }
+            }}
             className={`px-2 sm:px-4 py-2 rounded-t-lg font-retro transition-all duration-200 bg-synth-primary text-synth-background shadow-[0_0_10px_rgba(150,150,150,0.5)] border-b-2 border-grey-500 flex items-center gap-2
               ${selectedCategory?.id === category.id
                 ? 'bg-synth-primary text-synth-background shadow-[0_0_10px_rgba(255,0,255,0.5)] border-b-2 border-pink-500'
@@ -119,7 +127,7 @@ export default function CategoryTabs({
                 <TrashIcon className="w-4.5 h-4.5 sm:w-4 sm:h-4" />
               </button>
             </div>
-          </button>
+          </div>
         ))}
         <button
           onClick={() => setIsCreateModalOpen(true)}
@@ -244,7 +252,7 @@ export default function CategoryTabs({
         }}
         onConfirm={handleDeleteConfirm}
         title="Delete Category"
-        message={`Are you sure you want to delete the category "${categoryToDelete?.title}"?`}
+        message={`Are you sure you want to delete this category?\n\n"${categoryToDelete?.title}"`}
       />
     </div>
   );
