@@ -243,8 +243,10 @@ function Checklist() {
 
     // Compute new order for top-level only
     const currentTop = topLevelNotes.map(n => n.id);
-    const [removed] = currentTop.splice(currentTop.indexOf(sourceItem.note.id), 1);
-    currentTop.splice(currentTop.indexOf(destItem.note.id), 0, removed);
+    const sourceTopIndex = currentTop.indexOf(sourceItem.note.id);
+    const destTopIndexBefore = currentTop.indexOf(destItem.note.id); // capture BEFORE removal
+    const [removed] = currentTop.splice(sourceTopIndex, 1);
+    currentTop.splice(destTopIndexBefore, 0, removed);
 
     try {
       await reorderNotes(currentTop);
