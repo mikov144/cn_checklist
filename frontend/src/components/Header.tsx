@@ -100,9 +100,9 @@ function Header() {
         <div className="text-synth-secondary neon-text text-xl">
           {presence ? (
             <span>
-              Online: <span className="text-synth-primary">{presence.online}</span>
+              Online: <span className="highlight-text">{presence.online}</span>
               <span className="mx-2 text-gray-500">|</span>
-              Visited: <span className="text-synth-primary">{presence.total}</span>
+              Visited: <span className="highlight-text">{presence.total}</span>
             </span>
           ) : (
             <span>...</span>
@@ -216,9 +216,9 @@ function Header() {
         <div className="text-synth-secondary neon-text text-xl">
           {presence ? (
             <span>
-              Online: <span className="text-synth-primary">{presence.online}</span>
+              Online: <span className="highlight-text">{presence.online}</span>
               <span className="mx-2 text-gray-500">|</span>
-              Visited: <span className="text-synth-primary">{presence.total}</span>
+              Visited: <span className="highlight-text">{presence.total}</span>
             </span>
           ) : (
             <span>...</span>
