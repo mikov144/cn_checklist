@@ -223,6 +223,20 @@ function Checklist() {
   };
   walk(topLevelNotes, 0);
 
+  // Calculate display indices that count only top-level notes
+  const displayIndices: (number | null)[] = [];
+  {
+    let counter = 0;
+    flattened.forEach(({ level }) => {
+      if (level === 0) {
+        counter += 1;
+        displayIndices.push(counter);
+      } else {
+        displayIndices.push(null);
+      }
+    });
+  }
+
   const handleDragEnd = async (result: DropResult) => {
     if (!result.destination || !selectedCategory) return;
 
@@ -312,15 +326,15 @@ function Checklist() {
                       >
                         <Note 
                           note={note} 
-                          index={index}
                           onDelete={() => handleDeleteClick(note)}
                           onEdit={() => handleEditClick(note)}
                           onToggleScratchOut={toggleNoteScratchOut}
                           onToggleImportant={toggleNoteImportant}
                           dragHandleProps={level === 0 ? provided.dragHandleProps : undefined}
                           level={level}
-                          
+                          showDivider={index === flattened.length - 1 || flattened[index + 1].level === 0}
                           onCreateChild={handleCreateChild}
+                          displayIndex={displayIndices[index]}
                         />
                       </div>
                     )}

@@ -16,7 +16,6 @@ export interface NoteProps {
 
 interface NoteComponentProps {
   note: NoteProps;
-  index: number;
   onDelete: (id: number) => void;
   onEdit: (note: NoteProps) => void;
   onToggleScratchOut: (id: number, scratched_out: boolean) => void;
@@ -24,11 +23,13 @@ interface NoteComponentProps {
   dragHandleProps?: any;
   level?: number;
   onCreateChild?: (parentId: number) => void;
+  showDivider?: boolean;
+  displayIndex?: number | null;
 }
 
-function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImportant, dragHandleProps, level = 0, onCreateChild }: NoteComponentProps) {
+function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, dragHandleProps, level = 0, onCreateChild, showDivider = false, displayIndex = null }: NoteComponentProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 px-4 border-b border-synth-primary/30 group hover:bg-synth-primary/5 transition-colors" style={{ paddingLeft: `${level * 16}px` }}>
+    <div className={`flex flex-col sm:flex-row sm:items-center justify-between py-3 px-4 group hover:bg-synth-primary/5 transition-colors ${showDivider ? 'border-b border-synth-primary/30' : ''}`} style={{ paddingLeft: `${level * 16}px` }}>
       {/* Top row with controls - always visible */}
       <div className="flex items-center gap-4 mb-2 sm:mb-0">
         {/* Expand / collapse hidden to keep UI clean; spacer preserves layout */}
@@ -42,8 +43,8 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImpor
           <span className="w-6" />
         )}
 
-        {/* Sequential Index */}
-        <span className="text-synth-secondary font-mono min-w-[3ch]">{index + 1})</span>
+        {/* Sequential Index for top-level only; keep spacer width for children */}
+        <span className="text-synth-secondary font-mono min-w-[3ch]">{displayIndex !== null && displayIndex !== undefined ? `${displayIndex})` : ''}</span>
 
         {/* Important toggle */}
         <button
@@ -101,7 +102,7 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImpor
           {level === 0 && (
             <button
               onClick={() => onCreateChild && onCreateChild(note.id)}
-              className="p-2 text-synth-secondary hover:text-synth-primary transition-colors active:opacity-70 active:scale-95"
+              className="p-2 text-synth-secondary hover:text-synth-primary transition-colors active:opacity-70 active:scale-95 hover:text-pink-500"
               title="Add sub note"
             >
               <PlusIcon className="h-5 w-5 cursor-pointer" />
@@ -130,7 +131,7 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImpor
         <div className="flex sm:hidden mt-2">
           <button
             onClick={() => onCreateChild && onCreateChild(note.id)}
-            className="p-1.5 text-synth-secondary hover:text-synth-primary transition-colors active:opacity-70 active:scale-95"
+            className="p-1.5 text-synth-secondary hover:text-synth-primary transition-colors active:opacity-70 active:scale-95 hover:text-pink-500"
             title="Add sub note"
           >
             <PlusIcon className="h-5 w-5 cursor-pointer" />
