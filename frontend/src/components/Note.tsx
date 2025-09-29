@@ -46,13 +46,24 @@ function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, d
         {/* Sequential Index for top-level only; keep spacer width for children */}
         <span className="text-synth-secondary font-mono min-w-[3ch]">{displayIndex !== null && displayIndex !== undefined ? `${displayIndex})` : ''}</span>
 
+        {/* Mobile add sub note (top-level only) */}
+        {level === 0 && (
+          <button
+            onClick={() => onCreateChild && onCreateChild(note.id)}
+            className="p-1.5 text-synth-secondary hover:text-synth-primary transition-colors active:opacity-70 active:scale-95 hover:text-pink-500 sm:hidden"
+            title="Add sub note"
+          >
+            <PlusIcon className="h-4 w-4 sm:h-3 sm:w-3 cursor-pointer" />
+          </button>
+        )}
+
         {/* Important toggle */}
         <button
           onClick={() => onToggleImportant(note.id, !note.important)}
           className={`p-1.5 rounded transition-colors active:opacity-80 active:scale-95 ${note.important ? 'text-yellow-400' : 'text-synth-secondary hover:text-yellow-300'}`}
           title={note.important ? 'Unmark important' : 'Mark as important'}
         >
-          <ExclamationTriangleIcon className="h-6 w-6 sm:h-5 sm:w-5 cursor-pointer" />
+          <ExclamationTriangleIcon className="h-5 w-5 sm:h-4 sm:w-4 cursor-pointer" />
         </button>
 
         {/* Checkbox - consistent size */}
@@ -126,18 +137,7 @@ function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, d
           </button>
         </div>
       </div>
-      {/* Mobile add sub note */}
-      {level === 0 && (
-        <div className="flex sm:hidden mt-2">
-          <button
-            onClick={() => onCreateChild && onCreateChild(note.id)}
-            className="p-1.5 text-synth-secondary hover:text-synth-primary transition-colors active:opacity-70 active:scale-95 hover:text-pink-500"
-            title="Add sub note"
-          >
-            <PlusIcon className="h-5 w-5 cursor-pointer" />
-          </button>
-        </div>
-      )}
+      
     </div>
   );
 }
