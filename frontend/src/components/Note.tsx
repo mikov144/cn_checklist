@@ -1,6 +1,6 @@
 // src/components/Note.tsx
 
-import { PencilSquareIcon, TrashIcon, Bars2Icon, ExclamationTriangleIcon, ChevronRightIcon, ChevronDownIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon, TrashIcon, Bars2Icon, ExclamationTriangleIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 export interface NoteProps {
   id: number;
@@ -23,33 +23,16 @@ interface NoteComponentProps {
   onToggleImportant: (id: number, important: boolean) => void;
   dragHandleProps?: any;
   level?: number;
-  hasChildren?: boolean;
-  expanded?: boolean;
-  onToggleExpand?: () => void;
   onCreateChild?: (parentId: number) => void;
 }
 
-function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImportant, dragHandleProps, level = 0, hasChildren = false, expanded = false, onToggleExpand, onCreateChild }: NoteComponentProps) {
+function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImportant, dragHandleProps, level = 0, onCreateChild }: NoteComponentProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 px-4 border-b border-synth-primary/30 group hover:bg-synth-primary/5 transition-colors" style={{ paddingLeft: `${level * 16}px` }}>
       {/* Top row with controls - always visible */}
       <div className="flex items-center gap-4 mb-2 sm:mb-0">
-        {/* Expand / collapse */}
-        {hasChildren ? (
-          <button
-            onClick={onToggleExpand}
-            className="p-1 text-synth-secondary hover:text-synth-primary transition-colors active:opacity-70 active:scale-95"
-            title={expanded ? 'Collapse' : 'Expand'}
-          >
-            {expanded ? (
-              <ChevronDownIcon className="h-5 w-5" />
-            ) : (
-              <ChevronRightIcon className="h-5 w-5" />
-            )}
-          </button>
-        ) : (
-          <span className="w-5" />
-        )}
+        {/* Expand / collapse hidden to keep UI clean; spacer preserves layout */}
+        <span className="w-5" />
         {/* Drag handle - larger on mobile */}
         {dragHandleProps ? (
           <div {...(dragHandleProps || {})} className="cursor-grab active:cursor-grabbing opacity-50 group-hover:opacity-100 transition-opacity">

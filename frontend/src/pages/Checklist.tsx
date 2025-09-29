@@ -104,6 +104,7 @@ function Checklist() {
   const [noteToEdit, setNoteToEdit] = useState<NoteProps | null>(null);
   const [createFormData, setCreateFormData] = useState<FormData>({ content: "" });
   const [editFormData, setEditFormData] = useState<FormData>({ content: "" });
+  const [createParentId, setCreateParentId] = useState<number | null>(null);
 
   useEffect(() => {
     const initialize = async () => {
@@ -153,27 +154,24 @@ function Checklist() {
       return;
     }
     try {
-      await createNoteApi(createFormData.content, selectedCategory.id, null);
+      await createNoteApi(createFormData.content, selectedCategory.id, createParentId ?? null);
       setCreateFormData({ content: "" });
+      setCreateParentId(null);
       setIsCreateModalOpen(false);
     } catch (error) {
       alert("Failed to create note: " + error);
     }
   };
 
-  const handleCreateChild = useCallback(async (parentId: number) => {
+  const handleCreateChild = useCallback((parentId: number) => {
     if (!selectedCategory) {
       alert("Please select a category first");
       return;
     }
-    const content = prompt('Enter sub note content:');
-    if (!content) return;
-    try {
-      await createNoteApi(content, selectedCategory.id, parentId);
-    } catch (error) {
-      alert('Failed to create sub note: ' + error);
-    }
-  }, [createNoteApi, selectedCategory]);
+    setCreateParentId(parentId);
+    setCreateFormData({ content: "" });
+    setIsCreateModalOpen(true);
+  }, [selectedCategory]);
 
   const handleUpdateNote = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,6 +189,7 @@ function Checklist() {
   const handleCreateModalClose = useCallback(() => {
     setIsCreateModalOpen(false);
     setCreateFormData({ content: "" });
+    setCreateParentId(null);
   }, []);
 
   const handleEditModalClose = useCallback(() => {
@@ -211,15 +210,7 @@ function Checklist() {
   });
   const topLevelNotes = filteredNotes.filter(n => !(n as any).parent);
 
-  // Flatten tree for display respecting expanded state
-  const [expanded, setExpanded] = useState<Set<number>>(new Set());
-  const toggleExpand = useCallback((id: number) => {
-    setExpanded(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  }, []);
+  // Flatten tree for display with children always expanded
 
   type FlatItem = { note: NoteProps; level: number };
   const flattened: FlatItem[] = [];
@@ -227,7 +218,7 @@ function Checklist() {
     nodes.forEach(n => {
       flattened.push({ note: n, level });
       const kids = childrenByParent[n.id] || [];
-      if (kids.length && expanded.has(n.id)) walk(kids, level + 1);
+      if (kids.length) walk(kids, level + 1);
     });
   };
   walk(topLevelNotes, 0);
@@ -282,7 +273,10 @@ function Checklist() {
             Add Line
           </button>
           <button
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={() => {
+              setCreateParentId(null);
+              setIsCreateModalOpen(true);
+            }}
             className="button-retro px-6 py-2 rounded font-retro flex items-center text-lg cursor-pointer"
             disabled={!selectedCategory}
           >
@@ -325,9 +319,7 @@ function Checklist() {
                           onToggleImportant={toggleNoteImportant}
                           dragHandleProps={level === 0 ? provided.dragHandleProps : undefined}
                           level={level}
-                          hasChildren={(childrenByParent[note.id] || []).length > 0}
-                          expanded={expanded.has(note.id)}
-                          onToggleExpand={() => toggleExpand(note.id)}
+                          
                           onCreateChild={handleCreateChild}
                         />
                       </div>
@@ -364,7 +356,7 @@ function Checklist() {
       <Modal
         isOpen={isCreateModalOpen}
         onClose={handleCreateModalClose}
-        title="Create a Note"
+        title={createParentId !== null ? "Create a sub note" : "Create a Note"}
         showActions={false}
       >
         <NoteForm 
