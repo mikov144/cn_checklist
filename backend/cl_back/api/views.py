@@ -13,7 +13,8 @@ class NoteListCreate(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Note.objects.filter(author=user).order_by('order')
+        # Order by tree and then order for stable hierarchy rendering
+        return Note.objects.filter(author=user).order_by('tree_id', 'lft', 'order')
 
     def perform_create(self, serializer):
         if serializer.is_valid():

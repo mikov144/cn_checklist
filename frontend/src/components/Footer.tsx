@@ -7,7 +7,7 @@ function Footer() {
         <div className="flex flex-col items-center space-y-3">
           {/* Tech stack info */}
           <div className="flex flex-wrap justify-center items-center gap-2 text-md font-medium text-white/90">
-            <span className="text-cyan-300 font-bold neon-text">v0.3610</span>
+            <span className="text-cyan-300 font-bold neon-text">v0.389</span>
             <span className="sm:inline text-white/90">|</span>
             <span className="text-cyan-300 font-bold neon-text">Django REST</span>
             <span className="sm:inline text-white/90">|</span>

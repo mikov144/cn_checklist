@@ -9,7 +9,7 @@ interface NotesContextType {
   loading: boolean;
   error: Error | null;
   refreshNotes: () => Promise<void>;
-  createNote: (content: string, category: number) => Promise<void>;
+  createNote: (content: string, category: number, parent?: number | null) => Promise<void>;
   updateNote: (id: number, content: string) => Promise<void>;
   toggleNoteScratchOut: (id: number, scratched_out: boolean) => Promise<void>;
   toggleNoteImportant: (id: number, important: boolean) => Promise<void>;
@@ -37,9 +37,8 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       
       // Create and store the new request
       const request = api.get('/api/notes/').then(response => {
-        // Sort notes by order
-        const sortedNotes = [...response.data].sort((a, b) => a.order - b.order);
-        setNotes(sortedNotes);
+        // Backend returns hierarchical order; preserve it
+        setNotes(response.data);
       });
       pendingRequest.current = request;
 
@@ -53,11 +52,11 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const createNote = useCallback(async (content: string, category: number) => {
+  const createNote = useCallback(async (content: string, category: number, parent?: number | null) => {
     try {
       setLoading(true);
       setError(null);
-      await api.post('/api/notes/', { content, category });
+      await api.post('/api/notes/', { content, category, parent: parent ?? null });
       await refreshNotes();
     } catch (err) {
       setError(err as Error);

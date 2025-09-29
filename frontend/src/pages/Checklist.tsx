@@ -153,13 +153,27 @@ function Checklist() {
       return;
     }
     try {
-      await createNoteApi(createFormData.content, selectedCategory.id);
+      await createNoteApi(createFormData.content, selectedCategory.id, null);
       setCreateFormData({ content: "" });
       setIsCreateModalOpen(false);
     } catch (error) {
       alert("Failed to create note: " + error);
     }
   };
+
+  const handleCreateChild = useCallback(async (parentId: number) => {
+    if (!selectedCategory) {
+      alert("Please select a category first");
+      return;
+    }
+    const content = prompt('Enter sub note content:');
+    if (!content) return;
+    try {
+      await createNoteApi(content, selectedCategory.id, parentId);
+    } catch (error) {
+      alert('Failed to create sub note: ' + error);
+    }
+  }, [createNoteApi, selectedCategory]);
 
   const handleUpdateNote = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -185,41 +199,55 @@ function Checklist() {
     setNoteToEdit(null);
   }, []);
 
+  // Build a map by parent to create a hierarchical structure
   const filteredNotes = notes.filter(note => note.category === selectedCategory?.id);
+  const childrenByParent: Record<number, NoteProps[]> = {};
+  filteredNotes.forEach(n => {
+    const parentId = (n as any).parent as number | null | undefined;
+    if (parentId) {
+      if (!childrenByParent[parentId]) childrenByParent[parentId] = [];
+      childrenByParent[parentId].push(n);
+    }
+  });
+  const topLevelNotes = filteredNotes.filter(n => !(n as any).parent);
+
+  // Flatten tree for display respecting expanded state
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
+  const toggleExpand = useCallback((id: number) => {
+    setExpanded(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
+
+  type FlatItem = { note: NoteProps; level: number };
+  const flattened: FlatItem[] = [];
+  const walk = (nodes: NoteProps[], level: number) => {
+    nodes.forEach(n => {
+      flattened.push({ note: n, level });
+      const kids = childrenByParent[n.id] || [];
+      if (kids.length && expanded.has(n.id)) walk(kids, level + 1);
+    });
+  };
+  walk(topLevelNotes, 0);
 
   const handleDragEnd = async (result: DropResult) => {
     if (!result.destination || !selectedCategory) return;
 
-    // Create a new array with all notes
-    const allNotes = Array.from(notes);
-    
-    // Get the source and destination notes
-    const sourceNote = filteredNotes[result.source.index];
-    const destinationNote = filteredNotes[result.destination.index];
-    if (!sourceNote || !destinationNote) return;
-    
-    // Find the actual indices in the full notes array
-    const sourceIndex = allNotes.findIndex(note => note.id === sourceNote.id);
-    const destinationIndex = allNotes.findIndex(note => note.id === destinationNote.id);
-    if (sourceIndex === -1 || destinationIndex === -1) return;
-    
-    // Remove the source note
-    const [movedNote] = allNotes.splice(sourceIndex, 1);
-    
-    // Insert at the correct position
-    // When moving upward (destination < source), insert at the destination index
-    // When moving downward (destination > source), insert after the destination index
-    const insertIndex = destinationIndex > sourceIndex 
-      ? destinationIndex 
-      : destinationIndex;
-    
-    allNotes.splice(insertIndex, 0, movedNote);
-    
-    // Get all note IDs in their new order
-    const newOrder = allNotes.map(note => note.id);
-    
+    // Only allow dragging of top-level items
+    const sourceItem = flattened[result.source.index];
+    const destItem = flattened[result.destination.index];
+    if (!sourceItem || !destItem) return;
+    if (sourceItem.level !== 0 || destItem.level !== 0) return;
+
+    // Compute new order for top-level only
+    const currentTop = topLevelNotes.map(n => n.id);
+    const [removed] = currentTop.splice(currentTop.indexOf(sourceItem.note.id), 1);
+    currentTop.splice(currentTop.indexOf(destItem.note.id), 0, removed);
+
     try {
-      await reorderNotes(newOrder);
+      await reorderNotes(currentTop);
     } catch (error) {
       alert("Failed to reorder notes: " + error);
     }
@@ -275,7 +303,7 @@ function Checklist() {
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
-                {filteredNotes.map((note, index) => (
+                {flattened.map(({ note, level }, index) => (
                   <Draggable 
                     key={note.id} 
                     draggableId={note.id.toString()} 
@@ -284,7 +312,7 @@ function Checklist() {
                     {(provided: DraggableProvided) => (
                       <div
                         ref={provided.innerRef}
-                        {...provided.draggableProps}
+                        {...(level === 0 ? provided.draggableProps : {})}
                       >
                         <Note 
                           note={note} 
@@ -293,7 +321,12 @@ function Checklist() {
                           onEdit={() => handleEditClick(note)}
                           onToggleScratchOut={toggleNoteScratchOut}
                           onToggleImportant={toggleNoteImportant}
-                          dragHandleProps={provided.dragHandleProps}
+                          dragHandleProps={level === 0 ? provided.dragHandleProps : undefined}
+                          level={level}
+                          hasChildren={(childrenByParent[note.id] || []).length > 0}
+                          expanded={expanded.has(note.id)}
+                          onToggleExpand={() => toggleExpand(note.id)}
+                          onCreateChild={handleCreateChild}
                         />
                       </div>
                     )}
