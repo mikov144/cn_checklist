@@ -63,7 +63,7 @@ function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, d
           className={`p-1.5 rounded transition-colors active:opacity-80 active:scale-95 ${note.important ? 'text-yellow-400' : 'text-synth-secondary hover:text-yellow-300'}`}
           title={note.important ? 'Unmark important' : 'Mark as important'}
         >
-          <ExclamationTriangleIcon className="h-5 w-5 sm:h-4 sm:w-4 cursor-pointer" />
+          <ExclamationTriangleIcon className="h-6 w-6 sm:h-5 sm:w-5 cursor-pointer" />
         </button>
 
         {/* Checkbox - consistent size */}

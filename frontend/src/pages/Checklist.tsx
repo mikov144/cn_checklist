@@ -1,6 +1,6 @@
 // src/pages/Checklist.tsx
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, ReactNode } from "react";
 import { DragDropContext, Droppable, Draggable, DropResult, DroppableProvided, DraggableProvided } from "@hello-pangea/dnd";
 import Note, { NoteProps } from "../components/Note";
 import Header from "../components/Header";
@@ -210,48 +210,35 @@ function Checklist() {
   });
   const topLevelNotes = filteredNotes.filter(n => !(n as any).parent);
 
-  // Flatten tree for display with children always expanded
-
-  type FlatItem = { note: NoteProps; level: number };
-  const flattened: FlatItem[] = [];
-  const walk = (nodes: NoteProps[], level: number) => {
-    nodes.forEach(n => {
-      flattened.push({ note: n, level });
-      const kids = childrenByParent[n.id] || [];
-      if (kids.length) walk(kids, level + 1);
+  // Helper to recursively render descendants within a single draggable group
+  const renderDescendants = (parentId: number, level: number): ReactNode[] => {
+    const children = childrenByParent[parentId] || [];
+    const elements: ReactNode[] = [];
+    children.forEach((child) => {
+      elements.push(
+        <Note
+          key={child.id}
+          note={child}
+          onDelete={() => handleDeleteClick(child)}
+          onEdit={() => handleEditClick(child)}
+          onToggleScratchOut={toggleNoteScratchOut}
+          onToggleImportant={toggleNoteImportant}
+          level={level}
+          onCreateChild={handleCreateChild}
+        />
+      );
+      elements.push(...renderDescendants(child.id, level + 1));
     });
+    return elements;
   };
-  walk(topLevelNotes, 0);
-
-  // Calculate display indices that count only top-level notes
-  const displayIndices: (number | null)[] = [];
-  {
-    let counter = 0;
-    flattened.forEach(({ level }) => {
-      if (level === 0) {
-        counter += 1;
-        displayIndices.push(counter);
-      } else {
-        displayIndices.push(null);
-      }
-    });
-  }
 
   const handleDragEnd = async (result: DropResult) => {
     if (!result.destination || !selectedCategory) return;
 
-    // Only allow dragging of top-level items
-    const sourceItem = flattened[result.source.index];
-    const destItem = flattened[result.destination.index];
-    if (!sourceItem || !destItem) return;
-    if (sourceItem.level !== 0 || destItem.level !== 0) return;
-
-    // Compute new order for top-level only
+    // Compute new order for top-level groups only
     const currentTop = topLevelNotes.map(n => n.id);
-    const sourceTopIndex = currentTop.indexOf(sourceItem.note.id);
-    const destTopIndexBefore = currentTop.indexOf(destItem.note.id); // capture BEFORE removal
-    const [removed] = currentTop.splice(sourceTopIndex, 1);
-    currentTop.splice(destTopIndexBefore, 0, removed);
+    const [removed] = currentTop.splice(result.source.index, 1);
+    currentTop.splice(result.destination.index, 0, removed);
 
     try {
       await reorderNotes(currentTop);
@@ -313,7 +300,7 @@ function Checklist() {
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
-                {flattened.map(({ note, level }, index) => (
+                {topLevelNotes.map((note, index) => (
                   <Draggable 
                     key={note.id} 
                     draggableId={note.id.toString()} 
@@ -322,7 +309,7 @@ function Checklist() {
                     {(provided: DraggableProvided) => (
                       <div
                         ref={provided.innerRef}
-                        {...(level === 0 ? provided.draggableProps : {})}
+                        {...provided.draggableProps}
                       >
                         <Note 
                           note={note} 
@@ -330,12 +317,13 @@ function Checklist() {
                           onEdit={() => handleEditClick(note)}
                           onToggleScratchOut={toggleNoteScratchOut}
                           onToggleImportant={toggleNoteImportant}
-                          dragHandleProps={level === 0 ? provided.dragHandleProps : undefined}
-                          level={level}
-                          showDivider={index === flattened.length - 1 || flattened[index + 1].level === 0}
+                          dragHandleProps={provided.dragHandleProps}
+                          level={0}
                           onCreateChild={handleCreateChild}
-                          displayIndex={displayIndices[index]}
+                          displayIndex={index + 1}
                         />
+                        {renderDescendants(note.id, 1)}
+                        <div className="border-b border-synth-primary/30" />
                       </div>
                     )}
                   </Draggable>
