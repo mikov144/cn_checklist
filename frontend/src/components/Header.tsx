@@ -12,6 +12,7 @@ function Header() {
   const { user, loading, refreshUserData } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [presence, setPresence] = useState<{ online: number; total: number } | null>(null);
+  const [now, setNow] = useState<Date>(new Date());
   const HEARTBEAT_INTERVAL_MS = 30000; // 30s
   const ONLINE_WINDOW_FALLBACK_MS = 60000; // should match backend
 
@@ -24,6 +25,11 @@ function Header() {
     };
 
     initializeUser();
+  }, []);
+
+  useEffect(() => {
+    const timerId = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timerId);
   }, []);
 
   useEffect(() => {
@@ -67,6 +73,10 @@ function Header() {
       clearInterval(statsTimer);
     };
   }, []);
+
+  const dayShort = now.toLocaleDateString(undefined, { weekday: 'short' });
+  const time24 = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
+  const dateDots = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`;
 
   const handleLogout = () => {
     localStorage.clear();
@@ -196,6 +206,13 @@ function Header() {
 
       {/* User profile and auth button - visible only on desktop */}
       <div className="hidden md:flex items-center space-x-6">
+        <div className="text-synth-secondary neon-text text-xl leading-tight text-right">
+          <div>
+            <span className="mr-2 text-synth-secondary/80">{dayShort}</span>
+            <span className="highlight-text">{time24}</span>
+          </div>
+          <div className="text-synth-secondary/80">{dateDots}</div>
+        </div>
         <div className="text-synth-secondary neon-text text-xl">
           {presence ? (
             <span>
