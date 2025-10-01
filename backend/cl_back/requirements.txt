@@ -10,4 +10,4 @@ psycopg2-binary
 python-dotenv
 gunicorn
 Pillow
-django-mptt==0.14.0
+django-mptt==0.18.0
