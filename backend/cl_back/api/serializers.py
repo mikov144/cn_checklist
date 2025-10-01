@@ -61,9 +61,10 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ["id", "title"]
 
 class NoteSerializer(serializers.ModelSerializer):
+    parent = serializers.PrimaryKeyRelatedField(queryset=Note.objects.all(), allow_null=True, required=False)
     class Meta:
         model = Note
-        fields = ["id", "content", "created_at", "author", "category", "order", "scratched_out", "important"]
+        fields = ["id", "content", "created_at", "author", "category", "order", "scratched_out", "important", "parent"]
         extra_kwargs = {"author": {"read_only": True}}
 
 class ChangePasswordSerializer(serializers.Serializer):

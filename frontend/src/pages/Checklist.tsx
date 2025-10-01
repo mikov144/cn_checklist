@@ -1,6 +1,6 @@
 // src/pages/Checklist.tsx
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, ReactNode } from "react";
 import { DragDropContext, Droppable, Draggable, DropResult, DroppableProvided, DraggableProvided } from "@hello-pangea/dnd";
 import Note, { NoteProps } from "../components/Note";
 import Header from "../components/Header";
@@ -104,6 +104,7 @@ function Checklist() {
   const [noteToEdit, setNoteToEdit] = useState<NoteProps | null>(null);
   const [createFormData, setCreateFormData] = useState<FormData>({ content: "" });
   const [editFormData, setEditFormData] = useState<FormData>({ content: "" });
+  const [createParentId, setCreateParentId] = useState<number | null>(null);
 
   useEffect(() => {
     const initialize = async () => {
@@ -153,13 +154,24 @@ function Checklist() {
       return;
     }
     try {
-      await createNoteApi(createFormData.content, selectedCategory.id);
+      await createNoteApi(createFormData.content, selectedCategory.id, createParentId ?? null);
       setCreateFormData({ content: "" });
+      setCreateParentId(null);
       setIsCreateModalOpen(false);
     } catch (error) {
       alert("Failed to create note: " + error);
     }
   };
+
+  const handleCreateChild = useCallback((parentId: number) => {
+    if (!selectedCategory) {
+      alert("Please select a category first");
+      return;
+    }
+    setCreateParentId(parentId);
+    setCreateFormData({ content: "" });
+    setIsCreateModalOpen(true);
+  }, [selectedCategory]);
 
   const handleUpdateNote = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,6 +189,7 @@ function Checklist() {
   const handleCreateModalClose = useCallback(() => {
     setIsCreateModalOpen(false);
     setCreateFormData({ content: "" });
+    setCreateParentId(null);
   }, []);
 
   const handleEditModalClose = useCallback(() => {
@@ -185,41 +198,50 @@ function Checklist() {
     setNoteToEdit(null);
   }, []);
 
+  // Build a map by parent to create a hierarchical structure
   const filteredNotes = notes.filter(note => note.category === selectedCategory?.id);
+  const childrenByParent: Record<number, NoteProps[]> = {};
+  filteredNotes.forEach(n => {
+    const parentId = (n as any).parent as number | null | undefined;
+    if (parentId) {
+      if (!childrenByParent[parentId]) childrenByParent[parentId] = [];
+      childrenByParent[parentId].push(n);
+    }
+  });
+  const topLevelNotes = filteredNotes.filter(n => !(n as any).parent);
+
+  // Helper to recursively render descendants within a single draggable group
+  const renderDescendants = (parentId: number, level: number): ReactNode[] => {
+    const children = childrenByParent[parentId] || [];
+    const elements: ReactNode[] = [];
+    children.forEach((child) => {
+      elements.push(
+        <Note
+          key={child.id}
+          note={child}
+          onDelete={() => handleDeleteClick(child)}
+          onEdit={() => handleEditClick(child)}
+          onToggleScratchOut={toggleNoteScratchOut}
+          onToggleImportant={toggleNoteImportant}
+          level={level}
+          onCreateChild={handleCreateChild}
+        />
+      );
+      elements.push(...renderDescendants(child.id, level + 1));
+    });
+    return elements;
+  };
 
   const handleDragEnd = async (result: DropResult) => {
     if (!result.destination || !selectedCategory) return;
 
-    // Create a new array with all notes
-    const allNotes = Array.from(notes);
-    
-    // Get the source and destination notes
-    const sourceNote = filteredNotes[result.source.index];
-    const destinationNote = filteredNotes[result.destination.index];
-    if (!sourceNote || !destinationNote) return;
-    
-    // Find the actual indices in the full notes array
-    const sourceIndex = allNotes.findIndex(note => note.id === sourceNote.id);
-    const destinationIndex = allNotes.findIndex(note => note.id === destinationNote.id);
-    if (sourceIndex === -1 || destinationIndex === -1) return;
-    
-    // Remove the source note
-    const [movedNote] = allNotes.splice(sourceIndex, 1);
-    
-    // Insert at the correct position
-    // When moving upward (destination < source), insert at the destination index
-    // When moving downward (destination > source), insert after the destination index
-    const insertIndex = destinationIndex > sourceIndex 
-      ? destinationIndex 
-      : destinationIndex;
-    
-    allNotes.splice(insertIndex, 0, movedNote);
-    
-    // Get all note IDs in their new order
-    const newOrder = allNotes.map(note => note.id);
-    
+    // Compute new order for top-level groups only
+    const currentTop = topLevelNotes.map(n => n.id);
+    const [removed] = currentTop.splice(result.source.index, 1);
+    currentTop.splice(result.destination.index, 0, removed);
+
     try {
-      await reorderNotes(newOrder);
+      await reorderNotes(currentTop);
     } catch (error) {
       alert("Failed to reorder notes: " + error);
     }
@@ -252,7 +274,10 @@ function Checklist() {
             Add Line
           </button>
           <button
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={() => {
+              setCreateParentId(null);
+              setIsCreateModalOpen(true);
+            }}
             className="button-retro px-6 py-2 rounded font-retro flex items-center text-lg cursor-pointer"
             disabled={!selectedCategory}
           >
@@ -275,7 +300,7 @@ function Checklist() {
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
-                {filteredNotes.map((note, index) => (
+                {topLevelNotes.map((note, index) => (
                   <Draggable 
                     key={note.id} 
                     draggableId={note.id.toString()} 
@@ -288,13 +313,17 @@ function Checklist() {
                       >
                         <Note 
                           note={note} 
-                          index={index}
                           onDelete={() => handleDeleteClick(note)}
                           onEdit={() => handleEditClick(note)}
                           onToggleScratchOut={toggleNoteScratchOut}
                           onToggleImportant={toggleNoteImportant}
                           dragHandleProps={provided.dragHandleProps}
+                          level={0}
+                          onCreateChild={handleCreateChild}
+                          displayIndex={index + 1}
                         />
+                        {renderDescendants(note.id, 1)}
+                        <div className="border-b border-synth-primary/30" />
                       </div>
                     )}
                   </Draggable>
@@ -329,7 +358,7 @@ function Checklist() {
       <Modal
         isOpen={isCreateModalOpen}
         onClose={handleCreateModalClose}
-        title="Create a Note"
+        title={createParentId !== null ? "Create a sub note" : "Create a Note"}
         showActions={false}
       >
         <NoteForm 

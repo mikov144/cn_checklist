@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from mptt.models import MPTTModel, TreeForeignKey
 
 
 class Category(models.Model):
@@ -10,7 +11,7 @@ class Category(models.Model):
     def __str__(self):
         return self.title
 
-class Note(models.Model):
+class Note(MPTTModel):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notes")
@@ -18,15 +19,20 @@ class Note(models.Model):
     order = models.PositiveIntegerField(default=0)
     scratched_out = models.BooleanField(default=False)
     important = models.BooleanField(default=False)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
 
     def save(self, *args, **kwargs):
-        if self.order == 0:
-            max_order = Note.objects.filter(category=self.category).aggregate(models.Max('order'))['order__max']
+        # Only compute top-level ordering automatically. Children follow their parents visually.
+        if self.order == 0 and self.parent is None:
+            max_order = Note.objects.filter(category=self.category, parent__isnull=True).aggregate(models.Max('order'))['order__max']
             self.order = (max_order or 0) + 1
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.content[:20]  # Display the first 20 characters of the content
+
+    class MPTTMeta:
+        order_insertion_by = ['order', 'created_at']
 
 
 class Profile(models.Model):

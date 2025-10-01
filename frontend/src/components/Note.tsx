@@ -1,6 +1,6 @@
 // src/components/Note.tsx
 
-import { PencilSquareIcon, TrashIcon, Bars2Icon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon, TrashIcon, Bars2Icon, ExclamationTriangleIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 export interface NoteProps {
   id: number;
@@ -11,30 +11,51 @@ export interface NoteProps {
   order: number;
   scratched_out: boolean;
   important: boolean;
+  parent?: number | null;
 }
 
 interface NoteComponentProps {
   note: NoteProps;
-  index: number;
   onDelete: (id: number) => void;
   onEdit: (note: NoteProps) => void;
   onToggleScratchOut: (id: number, scratched_out: boolean) => void;
   onToggleImportant: (id: number, important: boolean) => void;
   dragHandleProps?: any;
+  level?: number;
+  onCreateChild?: (parentId: number) => void;
+  showDivider?: boolean;
+  displayIndex?: number | null;
 }
 
-function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImportant, dragHandleProps }: NoteComponentProps) {
+function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, dragHandleProps, level = 0, onCreateChild, showDivider = false, displayIndex = null }: NoteComponentProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 px-4 border-b border-synth-primary/30 group hover:bg-synth-primary/5 transition-colors">
+    <div className={`flex flex-col sm:flex-row sm:items-center justify-between py-3 px-4 group hover:bg-synth-primary/5 transition-colors ${showDivider ? 'border-b border-synth-primary/30' : ''}`} style={{ paddingLeft: `${level * 16}px` }}>
       {/* Top row with controls - always visible */}
       <div className="flex items-center gap-4 mb-2 sm:mb-0">
+        {/* Expand / collapse hidden to keep UI clean; spacer preserves layout */}
+        <span className="w-5" />
         {/* Drag handle - larger on mobile */}
-        <div {...dragHandleProps} className="cursor-grab active:cursor-grabbing opacity-50 group-hover:opacity-100 transition-opacity">
-          <Bars2Icon className="h-6 w-6 sm:h-5 sm:w-5 text-synth-primary" />
-        </div>
+        {dragHandleProps ? (
+          <div {...(dragHandleProps || {})} className="cursor-grab active:cursor-grabbing opacity-50 group-hover:opacity-100 transition-opacity">
+            <Bars2Icon className="h-6 w-6 sm:h-5 sm:w-5 text-synth-primary" />
+          </div>
+        ) : (
+          <span className="w-6" />
+        )}
 
-        {/* Sequential Index */}
-        <span className="text-synth-secondary font-mono min-w-[3ch]">{index + 1})</span>
+        {/* Sequential Index for top-level only; keep spacer width for children */}
+        <span className="text-synth-secondary font-mono min-w-[3ch]">{displayIndex !== null && displayIndex !== undefined ? `${displayIndex})` : ''}</span>
+
+        {/* Mobile add sub note (top-level only) */}
+        {level === 0 && (
+          <button
+            onClick={() => onCreateChild && onCreateChild(note.id)}
+            className="p-1.5 text-synth-secondary hover:text-synth-primary transition-colors active:opacity-70 active:scale-95 hover:text-pink-500 sm:hidden"
+            title="Add sub note"
+          >
+            <PlusIcon className="h-4 w-4 sm:h-3 sm:w-3 cursor-pointer" />
+          </button>
+        )}
 
         {/* Important toggle */}
         <button
@@ -89,6 +110,15 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImpor
 
         {/* Action buttons - desktop only */}
         <div className="hidden sm:flex space-x-2">
+          {level === 0 && (
+            <button
+              onClick={() => onCreateChild && onCreateChild(note.id)}
+              className="p-2 text-synth-secondary hover:text-synth-primary transition-colors active:opacity-70 active:scale-95 hover:text-pink-500"
+              title="Add sub note"
+            >
+              <PlusIcon className="h-5 w-5 cursor-pointer" />
+            </button>
+          )}
           <button
             onClick={() => onEdit(note)}
             className="p-2 text-synth-primary hover:text-pink-500 transition-colors
@@ -107,6 +137,7 @@ function Note({ note, index, onDelete, onEdit, onToggleScratchOut, onToggleImpor
           </button>
         </div>
       </div>
+      
     </div>
   );
 }

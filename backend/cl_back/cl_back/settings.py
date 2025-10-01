@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'api',
     'rest_framework',
     'corsheaders',
+    'mptt',
 ]
 
 MIDDLEWARE = [

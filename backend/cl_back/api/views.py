@@ -6,6 +6,7 @@ from .serializers import UserCreateSerializer, UserUpdateSerializer, NoteSeriali
 from .models import Note, Category, VisitorPresence
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models import OuterRef, Subquery
 
 class NoteListCreate(generics.ListCreateAPIView):
     serializer_class = NoteSerializer
@@ -13,7 +14,19 @@ class NoteListCreate(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Note.objects.filter(author=user).order_by('order')
+        # Order entire trees by their root note's "order" and preserve subtree order via lft
+        root_order_subquery = Note.objects.filter(
+            tree_id=OuterRef('tree_id'),
+            parent__isnull=True,
+            author=user,
+        ).values('order')[:1]
+
+        return (
+            Note.objects
+            .filter(author=user)
+            .annotate(root_order=Subquery(root_order_subquery))
+            .order_by('root_order', 'lft')
+        )
 
     def perform_create(self, serializer):
         if serializer.is_valid():
