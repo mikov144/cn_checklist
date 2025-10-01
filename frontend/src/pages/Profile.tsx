@@ -17,6 +17,8 @@ function Profile() {
   const [username, setUsername] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -110,6 +112,60 @@ function Profile() {
     }
   };
 
+  const EyeIcon = ({ className }: { className?: string }) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      className={className}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M2.036 12.322c1.91-4.308 5.812-7.322 9.964-7.322 4.152 0 8.054 3.014 9.964 7.322-1.91 4.308-5.812 7.322-9.964 7.322-4.152 0-8.054-3.014-9.964-7.322z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+      />
+    </svg>
+  );
+
+  const EyeOffIcon = ({ className }: { className?: string }) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      className={className}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.04 7.037 19 12 19c1.658 0 3.22-.33 4.611-.923"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M20.04 15.777A10.45 10.45 0 0022.066 12C20.774 7.96 16.963 5 12 5a10.45 10.45 0 00-4.611.923"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9.88 9.88a3 3 0 104.24 4.24"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3 3l18 18"
+      />
+    </svg>
+  );
+
   if (userLoading && !user) {
     return <LoadingIndicator />;
   }
@@ -145,23 +201,49 @@ function Profile() {
 
             <div className="space-y-4">
               <h3 className="text-2xl text-synth-text">Change Password</h3>
-              <div>
+              <div className="relative">
                 <input
-                  type="password"
+                  type={showOldPassword ? "text" : "password"}
                   value={oldPassword}
                   onChange={(e) => setOldPassword(e.target.value)}
-                  className="block w-full p-3 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
+                  className="block w-full p-3 pr-12 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
                   placeholder="Enter your current password"
                 />
+                <button
+                  type="button"
+                  aria-label={showOldPassword ? "Hide password" : "Show password"}
+                  onClick={() => setShowOldPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-synth-text/70 hover:text-synth-text active:text-synth-secondary cursor-pointer select-none transition duration-150 ease-out hover:scale-110 active:scale-95"
+                >
+                  {showOldPassword ? (
+                    <EyeOffIcon className="h-5 w-5" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5" />
+                  )}
+                </button>
               </div>
               <div>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="block w-full p-3 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
-                  placeholder="Enter your new password"
-                />
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="block w-full p-3 pr-12 border border-synth-primary rounded bg-synth-background text-synth-text neon-text focus:outline-none focus:ring-2 focus:ring-synth-secondary text-lg"
+                    placeholder="Enter your new password"
+                  />
+                  <button
+                    type="button"
+                    aria-label={showNewPassword ? "Hide password" : "Show password"}
+                    onClick={() => setShowNewPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-synth-text/70 hover:text-synth-text active:text-synth-secondary cursor-pointer select-none transition duration-150 ease-out hover:scale-110 active:scale-95"
+                  >
+                    {showNewPassword ? (
+                      <EyeOffIcon className="h-5 w-5" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5" />
+                    )}
+                  </button>
+              </div>
               </div>
               <button
                 type="button"
