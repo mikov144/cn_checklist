@@ -1,6 +1,4 @@
-// src/components/Note.tsx
-
-import { PencilSquareIcon, TrashIcon, Bars2Icon, ExclamationTriangleIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon, TrashIcon, Bars2Icon, ExclamationTriangleIcon, PlusIcon, ChevronRightIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
 export interface NoteProps {
   id: number;
@@ -25,9 +23,12 @@ interface NoteComponentProps {
   onCreateChild?: (parentId: number) => void;
   showDivider?: boolean;
   displayIndex?: number | null;
+  hasChildren?: boolean;
+  expanded?: boolean;
+  onToggleExpand?: () => void;
 }
 
-function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, dragHandleProps, level = 0, onCreateChild, showDivider = false, displayIndex = null }: NoteComponentProps) {
+function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, dragHandleProps, level = 0, onCreateChild, showDivider = false, displayIndex = null, hasChildren = false, expanded = false, onToggleExpand }: NoteComponentProps) {
   return (
     <div className={`flex flex-col sm:flex-row sm:items-center justify-between py-3 px-4 group hover:bg-synth-primary/5 transition-colors ${showDivider ? 'border-b border-synth-primary/30' : ''}`} style={{ paddingLeft: `${level * 35}px` }}>
       {/* Top row with controls - always visible */}
@@ -103,6 +104,22 @@ function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, d
 
       {/* Content and desktop action buttons */}
       <div className="flex items-center gap-4 flex-grow">
+        {/* Expand / collapse to the left of content with fixed width to align text */}
+        <div className="w-6 flex justify-center">
+          {hasChildren ? (
+            <button
+              onClick={onToggleExpand}
+              className="text-synth-secondary hover:text-pink-500 transition-colors active:opacity-70 active:scale-95"
+              title={expanded ? 'Collapse' : 'Expand'}
+            >
+              {expanded ? (
+                <ChevronDownIcon className="h-5 w-5" />
+              ) : (
+                <ChevronRightIcon className="h-5 w-5" />
+              )}
+            </button>
+          ) : null}
+        </div>
         <p className={`text-lg font-retro text-synth-text whitespace-pre-wrap flex-grow
           ${note.scratched_out ? 'line-through text-gray-400' : ''} ${note.important ? 'highlight-text' : ''}`}>
           {note.content}

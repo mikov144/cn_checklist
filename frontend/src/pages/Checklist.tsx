@@ -1,5 +1,3 @@
-// src/pages/Checklist.tsx
-
 import { useState, useEffect, useCallback, ReactNode } from "react";
 import { DragDropContext, Droppable, Draggable, DropResult, DroppableProvided, DraggableProvided } from "@hello-pangea/dnd";
 import Note, { NoteProps } from "../components/Note";
@@ -105,6 +103,7 @@ function Checklist() {
   const [createFormData, setCreateFormData] = useState<FormData>({ content: "" });
   const [editFormData, setEditFormData] = useState<FormData>({ content: "" });
   const [createParentId, setCreateParentId] = useState<number | null>(null);
+  const [expandedById, setExpandedById] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     const initialize = async () => {
@@ -210,21 +209,32 @@ function Checklist() {
   });
   const topLevelNotes = filteredNotes.filter(n => !(n as any).parent);
 
+  const hasChildren = useCallback((id: number) => (childrenByParent[id]?.length ?? 0) > 0, [childrenByParent]);
+  const toggleExpand = useCallback((id: number) => {
+    setExpandedById(prev => ({ ...prev, [id]: !prev[id] }));
+  }, []);
+
   // Helper to recursively render descendants within a single draggable group
   const renderDescendants = (parentId: number, level: number): ReactNode[] => {
     const children = childrenByParent[parentId] || [];
     const elements: ReactNode[] = [];
+    if (!expandedById[parentId]) {
+      return elements;
+    }
     children.forEach((child) => {
       elements.push(
         <Note
           key={child.id}
           note={child}
-          onDelete={() => handleDeleteClick(child)}
-          onEdit={() => handleEditClick(child)}
+          onDelete={(_id: number) => handleDeleteClick(child)}
+          onEdit={handleEditClick}
           onToggleScratchOut={toggleNoteScratchOut}
           onToggleImportant={toggleNoteImportant}
           level={level}
           onCreateChild={handleCreateChild}
+          hasChildren={hasChildren(child.id)}
+          expanded={!!expandedById[child.id]}
+          onToggleExpand={() => toggleExpand(child.id)}
         />
       );
       elements.push(...renderDescendants(child.id, level + 1));
@@ -313,14 +323,17 @@ function Checklist() {
                       >
                         <Note 
                           note={note} 
-                          onDelete={() => handleDeleteClick(note)}
-                          onEdit={() => handleEditClick(note)}
+                          onDelete={(_id: number) => handleDeleteClick(note)}
+                          onEdit={handleEditClick}
                           onToggleScratchOut={toggleNoteScratchOut}
                           onToggleImportant={toggleNoteImportant}
                           dragHandleProps={provided.dragHandleProps}
                           level={0}
                           onCreateChild={handleCreateChild}
                           displayIndex={index + 1}
+                          hasChildren={hasChildren(note.id)}
+                          expanded={!!expandedById[note.id]}
+                          onToggleExpand={() => toggleExpand(note.id)}
                         />
                         {renderDescendants(note.id, 1)}
                         <div className="border-b border-synth-primary/30" />
