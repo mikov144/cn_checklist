@@ -29,11 +29,11 @@ interface NoteComponentProps {
 
 function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, dragHandleProps, level = 0, onCreateChild, showDivider = false, displayIndex = null }: NoteComponentProps) {
   return (
-    <div className={`flex flex-col sm:flex-row sm:items-center justify-between py-3 px-4 group hover:bg-synth-primary/5 transition-colors ${showDivider ? 'border-b border-synth-primary/30' : ''}`} style={{ paddingLeft: `${level * 16}px` }}>
+    <div className={`flex flex-col sm:flex-row sm:items-center justify-between py-3 px-4 group hover:bg-synth-primary/5 transition-colors ${showDivider ? 'border-b border-synth-primary/30' : ''}`} style={{ paddingLeft: `${level * 35}px` }}>
       {/* Top row with controls - always visible */}
-      <div className="flex items-center gap-4 mb-2 sm:mb-0">
+      <div className="flex items-center gap-3 sm:gap-4 mb-2 sm:mb-0">
         {/* Expand / collapse hidden to keep UI clean; spacer preserves layout */}
-        <span className="w-5" />
+        <span className="w-4" />
         {/* Drag handle - larger on mobile */}
         {dragHandleProps ? (
           <div {...(dragHandleProps || {})} className="cursor-grab active:cursor-grabbing opacity-50 group-hover:opacity-100 transition-opacity">
@@ -50,7 +50,7 @@ function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, d
         {level === 0 && (
           <button
             onClick={() => onCreateChild && onCreateChild(note.id)}
-            className="p-1.5 text-synth-secondary hover:text-synth-primary transition-colors active:opacity-70 active:scale-95 hover:text-pink-500 sm:hidden"
+            className="p-1 text-synth-secondary hover:text-synth-primary transition-colors active:opacity-70 active:scale-95 hover:text-pink-500 sm:hidden"
             title="Add sub note"
           >
             <PlusIcon className="h-4 w-4 sm:h-3 sm:w-3 cursor-pointer" />
@@ -60,10 +60,10 @@ function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, d
         {/* Important toggle */}
         <button
           onClick={() => onToggleImportant(note.id, !note.important)}
-          className={`p-1.5 rounded transition-colors active:opacity-80 active:scale-95 ${note.important ? 'text-yellow-400' : 'text-synth-secondary hover:text-yellow-300'}`}
+          className={`p-1 rounded transition-colors active:opacity-80 active:scale-95 ${note.important ? 'text-yellow-400' : 'text-synth-secondary hover:text-yellow-300'}`}
           title={note.important ? 'Unmark important' : 'Mark as important'}
         >
-          <ExclamationTriangleIcon className="h-6 w-6 sm:h-5 sm:w-5 cursor-pointer" />
+          <ExclamationTriangleIcon className="h-5 w-5 sm:h-5 sm:w-5 cursor-pointer" />
         </button>
 
         {/* Checkbox - consistent size */}
@@ -81,10 +81,10 @@ function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, d
         />
 
         {/* Action buttons - shown next to content on desktop, below controls on mobile */}
-        <div className="flex space-x-2 sm:hidden">
+        <div className="flex space-x-1 sm:hidden">
           <button
             onClick={() => onEdit(note)}
-            className="p-1.5 text-synth-primary hover:text-pink-500 transition-colors
+            className="p-1 text-synth-primary hover:text-pink-500 transition-colors
               active:opacity-70 active:scale-95 active:text-pink-600"
             title="Edit note"
           >
@@ -92,7 +92,7 @@ function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, d
           </button>
           <button
             onClick={() => onDelete(note.id)}
-            className="p-1.5 text-red-500 hover:text-red-400 transition-colors
+            className="p-1 text-red-500 hover:text-red-400 transition-colors
               active:opacity-70 active:scale-95 active:text-red-600"
             title="Delete note"
           >
