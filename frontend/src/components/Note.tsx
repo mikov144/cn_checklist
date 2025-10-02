@@ -109,7 +109,7 @@ function Note({ note, onDelete, onEdit, onToggleScratchOut, onToggleImportant, d
           {hasChildren ? (
             <button
               onClick={onToggleExpand}
-              className="text-synth-secondary hover:text-pink-500 transition-colors active:opacity-70 active:scale-95"
+              className="text-synth-secondary hover:text-pink-500 transition-colors active:opacity-70 active:scale-95 cursor-pointer"
               title={expanded ? 'Collapse' : 'Expand'}
             >
               {expanded ? (
