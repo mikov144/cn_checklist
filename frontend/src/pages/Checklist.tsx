@@ -115,7 +115,7 @@ function Checklist() {
 
   const handleDeleteClick = useCallback(async (note: NoteProps) => {
     // If it's a line separator, delete directly without confirmation
-    if (note.content === "---------------------------------------------------------------------------------------------------------------") {
+    if (note.content === "------------------------------------------------------------------------------------------------------------") {
       try {
         await deleteNoteApi(note.id);
       } catch (error) {
@@ -273,7 +273,7 @@ function Checklist() {
                 return;
               }
               try {
-                await createNoteApi("---------------------------------------------------------------------------------------------------------------", selectedCategory.id);
+                await createNoteApi("------------------------------------------------------------------------------------------------------------", selectedCategory.id);
               } catch (error) {
                 alert("Failed to create line: " + error);
               }
